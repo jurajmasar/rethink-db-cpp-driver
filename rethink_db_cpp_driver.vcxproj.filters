@@ -149,5 +149,8 @@
     <ClInclude Include="proto\ql2.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="rethink_db.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
