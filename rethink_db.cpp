@@ -59,18 +59,6 @@ namespace com {
 
 				int64_t token;
 
-				/*
-				int send_version() {
-					if (version_sent) return 0;
-
-					if (send("\x35\xba\x61\xaf", 4) == 0) {
-						version_sent = 1;
-						return 0;
-					}
-
-					return -1;
-				}
-				*/
 				void handle_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator)
 				{
 					std::cout << "Debug: In handle_resolve..." << std::endl;
@@ -95,28 +83,15 @@ namespace com {
 					{
 						std::ostream request_stream(&request_);
 
-						u_int x = com::rethinkdb::VersionDummy::V0_2;
-						request_stream.write((char*)&x, sizeof (u_int));
-
-						x = auth_key.length();
-						request_stream.write((char*)&x, sizeof (u_int));
-
-						request_stream.write(auth_key.c_str(), auth_key.length());
-
-						/*
-						std::bitset<30> x(0);
-						std::string s = x.to_string();
-						request_stream.write(s.c_str(), s.length());
-						*/
-
-						
 						// send magic version number
-						/*request_stream.put(com::rethinkdb::VersionDummy::V0_2);
+						request_stream.write((char*)&(com::rethinkdb::VersionDummy::V0_2), sizeof (com::rethinkdb::VersionDummy::V0_2));
 						
+						// send auth_key length
+						u_int auth_key_length = auth_key.length();
+						request_stream.write((char*)&auth_key_length, sizeof (u_int));
+
 						// send auth_key
-						request_stream.put(auth_key.length());
-						request_stream << auth_key;
-						*/
+						request_stream.write(auth_key.c_str(), auth_key.length());
 
 						// The connection was successful. Send the request.
 						boost::asio::async_write(socket_, request_,
@@ -150,20 +125,14 @@ namespace com {
 				void handle_read_status_line(const boost::system::error_code& err)
 				{
 					std::cout << "Debug: In handle_read_status_line..." << std::endl;
-					if (!err) // if (!err)
+					if (!err) 
 					{
 						// Check that response is OK.
 
 						std::istream response_stream(&response_);
 						std::string response;
-						response_stream >> response;
-						std::cout << "Response: " << response << std::endl;
-						/*
-						std::istream response_stream(&response_);
-						std::string response;
 						std::getline(response_stream,response);
-						std::cout << response << std::endl;
-						*/
+						std::cout << "Response: " << response << std::endl;
 					}
 					else
 					{
