@@ -7,6 +7,7 @@
 #include <boost/function.hpp>
 #include <boost/bind/protect.hpp>
 #include <stdlib.h>
+#include <boost/algorithm/string.hpp>
 
 // fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
 #if defined(_MSC_VER)
@@ -25,7 +26,7 @@ namespace com {
 
 				connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key, int timeout);
 				int connect();
-				//void test();
+				void create_db(std::string db_name);
 			private:
 
 				std::string host;

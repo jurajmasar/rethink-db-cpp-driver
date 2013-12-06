@@ -59,6 +59,7 @@ namespace com {
 		}
 		
 		void connection::handle_write_request(const boost::system::error_code& err) {
+			std::cout << "In handle_write_request" << std::endl;
 			if (!err) {
 				// Read the response status line. The response_ streambuf will
 				// automatically grow to accommodate the entire line. The growth may be
@@ -76,26 +77,43 @@ namespace com {
 				std::istream response_stream(&response_);
 				std::string response;
 				std::getline(response_stream, response);
-				if (response == "SUCCESS") {
+				if (response.substr(0,7) == "SUCCESS") {
+					std::cout << "Successfully connected." << std::endl;
+					std::cout << "Response: '" << response << "'\n";
 					this->is_connected = true;
 				} else {
 					this->is_connected = false;
-					std::cout << "Error in handle_read_connect_response: " << response << "\n";
+					std::cout << "Error in handle_read_connect_response: '" << response << "'\n";
 				}
 			} else {
 				std::cout << "Error in handle_read_connect_response: " << err << "\n";
 			}
 		}
-		/*
-		void connection::test() {
+		
+		void connection::create_db(std::string db_name) {
+			com::rethinkdb::Term t = com::rethinkdb::Term();
+			t.set_type(com::rethinkdb::Term::TermType::Term_TermType_DB_CREATE);
+
+			com::rethinkdb::Term *t_name;
+			t_name = t.add_args();
+			t_name->set_type(com::rethinkdb::Term::TermType::Term_TermType_DATUM);
+			std::cout << "Debug point." << std::endl;
+			com::rethinkdb::Datum *datum;
+			datum = t_name->mutable_datum();
+			datum->set_type(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR);
+			datum->set_r_str(db_name);
 			
-			com::rethinkdb::Query q = com::rethinkdb::Query();
-			MetaQuery mq = META_QUERY__INIT;
-			q.type = QUERY__QUERY_TYPE__META;
-			q.token = rdb_conn->token;
-			q.meta_query = &mq;
-			mq.type = META_QUERY__META_QUERY_TYPE__CREATE_DB;
-			mq.db_name = dbname;
-		} */
+			std::ostream request_stream(&request_);
+			std::string blob = t.SerializeAsString();
+			
+			u_int blob_length = blob.length();
+			request_stream.write((char*)&blob, sizeof (u_int));
+
+			request_stream.write(blob.c_str(), blob.length());
+
+			boost::asio::async_write(socket_, request_,
+				boost::bind(&connection::handle_write_request, this,
+				boost::asio::placeholders::error));
+		} 
 	}
 }
