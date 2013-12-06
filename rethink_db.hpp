@@ -5,6 +5,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/bind/protect.hpp>
 #include <stdlib.h>
 
 // fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
@@ -24,7 +25,7 @@ namespace com {
 
 				connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key, int timeout);
 				int connect();
-
+				//void test();
 			private:
 
 				std::string host;
@@ -33,6 +34,7 @@ namespace com {
 				std::string auth_key;
 				int timeout;
 				int64_t token;
+				bool is_connected;
 
 				boost::asio::io_service io_service;
 				boost::asio::ip::tcp::resolver resolver_;
@@ -42,8 +44,10 @@ namespace com {
 
 				void handle_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
 				void handle_connect(const boost::system::error_code& err);
+
 				void handle_write_request(const boost::system::error_code& err);
-			    void handle_read_status_line(const boost::system::error_code& err);
+
+				void handle_read_connect_response(const boost::system::error_code& err);
 
 		};
 	}

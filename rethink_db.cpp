@@ -8,6 +8,7 @@ namespace com {
 			this->database = database;
 			this->auth_key = auth_key;
 			this->timeout = timeout;
+			this->is_connected = false;
 		}
 
 		int connection::connect() {
@@ -63,22 +64,38 @@ namespace com {
 				// automatically grow to accommodate the entire line. The growth may be
 				// limited by passing a maximum size to the streambuf constructor.
 				boost::asio::async_read_until(socket_, response_, 0,
-					boost::bind(&connection::handle_read_status_line, this,
+					boost::bind(&connection::handle_read_connect_response, this,
 					boost::asio::placeholders::error));
 			} else {
 				std::cout << "Error in handle_write_request: " << err.message() << "\n";
 			}
 		}
 
-		void connection::handle_read_status_line(const boost::system::error_code& err) {
+		void connection::handle_read_connect_response(const boost::system::error_code& err) {
 			if (!err) {
 				std::istream response_stream(&response_);
 				std::string response;
 				std::getline(response_stream, response);
-				std::cout << "Response: " << response << std::endl;
+				if (response == "SUCCESS") {
+					this->is_connected = true;
+				} else {
+					this->is_connected = false;
+					std::cout << "Error in handle_read_connect_response: " << response << "\n";
+				}
 			} else {
-				std::cout << "Error4: " << err << "\n";
+				std::cout << "Error in handle_read_connect_response: " << err << "\n";
 			}
 		}
+		/*
+		void connection::test() {
+			
+			com::rethinkdb::Query q = com::rethinkdb::Query();
+			MetaQuery mq = META_QUERY__INIT;
+			q.type = QUERY__QUERY_TYPE__META;
+			q.token = rdb_conn->token;
+			q.meta_query = &mq;
+			mq.type = META_QUERY__META_QUERY_TYPE__CREATE_DB;
+			mq.db_name = dbname;
+		} */
 	}
 }
