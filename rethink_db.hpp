@@ -4,10 +4,7 @@
 #include <stdint.h>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/bind/protect.hpp>
 #include <stdlib.h>
-#include <boost/algorithm/string.hpp>
 
 // fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
 #if defined(_MSC_VER)
@@ -25,7 +22,7 @@ namespace com {
 			public:
 
 				connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key, int timeout);
-				int connect();
+				void connect();
 				void create_db(std::string db_name);
 			private:
 
@@ -43,12 +40,6 @@ namespace com {
 				boost::asio::streambuf request_;
 				boost::asio::streambuf response_;
 
-				void handle_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
-				void handle_connect(const boost::system::error_code& err);
-
-				void handle_write_request(const boost::system::error_code& err);
-
-				void handle_read_connect_response(const boost::system::error_code& err);
 
 		};
 	}
