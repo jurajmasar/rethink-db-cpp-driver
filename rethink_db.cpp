@@ -1,7 +1,49 @@
 #include "rethink_db.hpp"
+#include <exception>
 
 namespace com {
 	namespace rethinkdb {
+
+		//
+		// definitions of exceptions
+		//
+
+		class connection_exception : public std::exception
+		{
+			virtual const char* what() const throw()
+			{
+				return "RethinkDB connection exception occurred.";
+			}
+		} connection_ex;
+
+		class runtime_exception : public std::exception
+		{
+			virtual const char* what() const throw()
+			{
+				return "RethinkDB runtime exception occurred.";
+			}
+		} runtime_ex;
+
+		class compile_error_exception : public std::exception
+		{
+			virtual const char* what() const throw()
+			{
+				return "RethinkDB compile error exception occurred.";
+			}
+		} compile_ex;
+
+		class client_error_exception : public std::exception
+		{
+			virtual const char* what() const throw()
+			{
+				return "RethinkDB client error exception occurred.";
+			}
+		} client_ex;
+
+		//
+		// implementation of connection class
+		//
+
 		connection::connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key) : resolver_(io_service), socket_(io_service) {
 			this->host = host;
 			this->port = port;
