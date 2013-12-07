@@ -82,11 +82,43 @@ namespace com {
 			try {
 				boost::asio::write(socket_, request_);
 
+				//
+				// read response
+				//
+
+				// read response length
+				u_int response_length;
+
+				size_t read_length = boost::asio::read(socket_,
+					boost::asio::buffer(&response_length, sizeof(u_int)));
+				
+				// read protobuf
+				
+				enum { max_length = 1024 };
+				char reply[max_length];
+				size_t reply_length = boost::asio::read(socket_,
+					boost::asio::buffer(reply, read_length));
+				com::rethinkdb::Response response = com::rethinkdb::Response();
+				response.ParseFromArray(reply, reply_length);
+				std::cout << "Debug string: '" << response.DebugString() << "'\n";
+				/*
+				boost::asio::read(socket_, boost::asio::buffer(&response_, response_length));
+
+				com::rethinkdb::Response response = com::rethinkdb::Response();
+				
+				std::istream *response_stream;
+				response_stream = new std::istream(&response_);
+				response.ParseFromIstream(response_stream);
+				*/
+				//std::istream response_stream(&response_);
+				//std::cout << "Response: '" << response_string << "'\n";
+
 			}
 			catch (std::exception& e)
 			{
 				std::cerr << "Exception: " << e.what() << "\n";
 			}
+
 
 		} 
 	}
