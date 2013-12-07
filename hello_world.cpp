@@ -6,7 +6,7 @@ using namespace std;
 int main(int argc, char* argv) {
 	cout << "Hello world" << endl;
 
-	com::rethinkdb::connection *conn = new com::rethinkdb::connection("10.211.55.2", "28015", "test", "", NULL);
+	com::rethinkdb::connection *conn = new com::rethinkdb::connection("10.211.55.2", "28015", "test", "mojkluc");
 	conn->connect();
 	conn->create_db("myDB");
 	delete conn;

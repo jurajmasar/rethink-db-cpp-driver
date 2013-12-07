@@ -21,7 +21,7 @@ namespace com {
 
 			public:
 
-				connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key, int timeout);
+				connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key);
 				void connect();
 				void create_db(std::string db_name);
 			private:

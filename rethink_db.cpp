@@ -2,12 +2,11 @@
 
 namespace com {
 	namespace rethinkdb {
-		connection::connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key, int timeout) : resolver_(io_service), socket_(io_service) {
+		connection::connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key) : resolver_(io_service), socket_(io_service) {
 			this->host = host;
 			this->port = port;
 			this->database = database;
 			this->auth_key = auth_key;
-			this->timeout = timeout;
 			this->is_connected = false;
 		}
 
@@ -93,27 +92,21 @@ namespace com {
 					boost::asio::buffer(&response_length, sizeof(u_int)));
 				
 				// read protobuf
-				
-				char* reply = new char[read_length];
+				std::cout << "read_length: " << response_length << std::endl;
+
+				//read_length = 37;
+
+				char* reply = new char[response_length];
 				size_t reply_length = boost::asio::read(socket_,
-					boost::asio::buffer(reply, read_length));
+					boost::asio::buffer(reply, response_length));
+
+				std::cout << "reply_length: " << reply_length << std::endl;
+
 
 				com::rethinkdb::Response response = com::rethinkdb::Response();
-				response.ParseFromArray(reply, reply_length);
+				response.ParseFromArray(reply, response_length);
 				delete[] reply;
-
-				std::cout << "Debug string: '" << response.DebugString() << "'\n";
-				/*
-				boost::asio::read(socket_, boost::asio::buffer(&response_, response_length));
-
-				com::rethinkdb::Response response = com::rethinkdb::Response();
-				
-				std::istream *response_stream;
-				response_stream = new std::istream(&response_);
-				response.ParseFromIstream(response_stream);
-				*/
-				//std::istream response_stream(&response_);
-				//std::cout << "Response: '" << response_string << "'\n";
+				response.PrintDebugString();
 
 			}
 			catch (std::exception& e)
