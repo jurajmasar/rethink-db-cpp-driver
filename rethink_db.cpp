@@ -94,12 +94,14 @@ namespace com {
 				
 				// read protobuf
 				
-				enum { max_length = 1024 };
-				char reply[max_length];
+				char* reply = new char[read_length];
 				size_t reply_length = boost::asio::read(socket_,
 					boost::asio::buffer(reply, read_length));
+
 				com::rethinkdb::Response response = com::rethinkdb::Response();
 				response.ParseFromArray(reply, reply_length);
+				delete[] reply;
+
 				std::cout << "Debug string: '" << response.DebugString() << "'\n";
 				/*
 				boost::asio::read(socket_, boost::asio::buffer(&response_, response_length));
