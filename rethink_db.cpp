@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdexcept>
 #include <boost/format.hpp>
+#include <vector>
 
 // fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
 #if defined(_MSC_VER)
@@ -27,25 +28,25 @@ namespace com {
 		class connection_exception : public std::runtime_error{
 		public:
 			connection_exception() :runtime_error(""){}
-			connection_exception(const std::string& msg) : runtime_error(("RethinkDB connection exception occurred. " + msg).c_str()){}
+			connection_exception(const std::string& msg) : runtime_error(("RethinkDB connection exception. " + msg).c_str()){}
 		};
 
 		class runtime_error_exception : public std::runtime_error {
 		public:
 			runtime_error_exception() : runtime_error(""){}
-			runtime_error_exception(const std::string& msg) : runtime_error(("RethinkDB runtime exception occurred. " + msg).c_str()){}
+			runtime_error_exception(const std::string& msg) : runtime_error(("RethinkDB runtime exception. " + msg).c_str()){}
 		};
 
 		class compile_error_exception : public std::runtime_error {
 		public:
 			compile_error_exception() :runtime_error(""){}
-			compile_error_exception(const std::string& msg) : runtime_error(("RethinkDB compile error exception occurred. " + msg).c_str()){}
+			compile_error_exception(const std::string& msg) : runtime_error(("RethinkDB compile error exception. " + msg).c_str()){}
 		};
 
 		class client_error_exception : public std::runtime_error {
 		public:
 			client_error_exception() :runtime_error(""){}
-			client_error_exception(const std::string& msg) : runtime_error(("RethinkDB client error exception occurred. " + msg).c_str()){}
+			client_error_exception(const std::string& msg) : runtime_error(("RethinkDB client error exception. " + msg).c_str()){}
 		};
 
 
@@ -202,7 +203,7 @@ namespace com {
 		// implementation of query class				
 		//
 
-		class Cursor {}; // TODO
+		class object {}; // TODO
 
 		class RQL {
 			public:
@@ -215,7 +216,7 @@ namespace com {
 
 				RQL() : RQL(com::rethinkdb::Query::QueryType::Query_QueryType_START) {};
 
-				RQL* db_create(std::string& name) {
+				RQL* db_create(const std::string& name) {
 
 					com::rethinkdb::Term *term;
 					term = this->query.mutable_query();
@@ -233,14 +234,14 @@ namespace com {
 					return this;
 				}
 
-				Cursor run(connection& conn) {
+				std::vector<object> run(std::shared_ptr<connection> conn) {
 					// TODO - optargs?
 
 					// write query
-					conn.write_query(this->query);
+					conn->write_query(this->query);
 
 					// read response
-					std::shared_ptr<com::rethinkdb::Response> response(conn.read_response());
+					std::shared_ptr<com::rethinkdb::Response> response(conn->read_response());
 
 					switch (response->type()) {
 						case com::rethinkdb::Response::ResponseType::Response_ResponseType_RUNTIME_ERROR:

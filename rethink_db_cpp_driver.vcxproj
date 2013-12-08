@@ -76,7 +76,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="hello_world.cpp" />
+    <ClCompile Include="example.cpp" />
     <ClCompile Include="proto\ql2.pb.cc" />
     <ClCompile Include="rethink_db.cpp" />
   </ItemGroup>
