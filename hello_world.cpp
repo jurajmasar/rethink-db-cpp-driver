@@ -7,7 +7,8 @@ int main(int argc, char* argv) {
 	cout << "Hello world" << endl;
 
 	com::rethinkdb::connection *conn = new com::rethinkdb::connection("10.211.55.2", "28015", "test", "mojkluc");
-	conn->create_db("myDB");
+	//com::rethinkdb::RQL 
+	//conn->create_db("myDB");
 	delete conn;
 	return 0;
 }

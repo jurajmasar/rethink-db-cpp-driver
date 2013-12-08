@@ -25,7 +25,10 @@ namespace com {
 
 				connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key);
 				bool connect();
-				void create_db(std::string db_name);
+
+				std::shared_ptr<com::rethinkdb::Response> read_response();
+				void write_query(const com::rethinkdb::Query& query);
+
 			private:
 
 				std::string host;
@@ -42,8 +45,6 @@ namespace com {
 				boost::asio::streambuf request_;
 				boost::asio::streambuf response_;
 
-				std::shared_ptr<com::rethinkdb::Response> read_response();
-				void write_query(const com::rethinkdb::Query& query);
 
 		};
 	}

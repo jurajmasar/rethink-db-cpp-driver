@@ -9,27 +9,94 @@ namespace com {
 
 		class connection_exception : public std::runtime_error{
 		public:
-			connection_exception() :runtime_error("RethinkDB connection exception occurred."){}
-			connection_exception(const std::string& msg) :runtime_error(msg.c_str()){}
+			connection_exception() :runtime_error(""){}
+			connection_exception(const std::string& msg) : runtime_error(("RethinkDB connection exception occurred. " + msg).c_str()){}
 		};
 
 		class runtime_error_exception : public std::runtime_error {
 		public:
-			runtime_error_exception() : runtime_error("RethinkDB runtime exception occurred."){}
-			runtime_error_exception(const std::string& msg) : runtime_error(msg.c_str()){}
+			runtime_error_exception() : runtime_error(""){}
+			runtime_error_exception(const std::string& msg) : runtime_error(("RethinkDB runtime exception occurred. " + msg).c_str()){}
 		};
 
 		class compile_error_exception : public std::runtime_error {
 		public:
-			compile_error_exception() :runtime_error("RethinkDB compile error exception occurred."){}
-			compile_error_exception(const std::string& msg) :runtime_error(msg.c_str()){}
+			compile_error_exception() :runtime_error(""){}
+			compile_error_exception(const std::string& msg) : runtime_error(("RethinkDB compile error exception occurred. " + msg).c_str()){}
 		};
 
 		class client_error_exception : public std::runtime_error {
 		public:
-			client_error_exception() :runtime_error("RethinkDB client error exception occurred."){}
-			client_error_exception(const std::string& msg) :runtime_error(msg.c_str()){}
+			client_error_exception() :runtime_error(""){}
+			client_error_exception(const std::string& msg) : runtime_error(("RethinkDB client error exception occurred. " + msg).c_str()){}
 		};
+
+		//
+		// implementation of query class				
+		//
+
+		class Cursor {}; // TODO
+
+		class RQL {
+			public:
+				RQL(com::rethinkdb::Query::QueryType query_type) : query(com::rethinkdb::Query()) {
+					this->query.set_type(query_type);
+
+					// generate random token
+					this->query.set_token(rand());
+				}
+
+				RQL() : RQL(com::rethinkdb::Query::QueryType::Query_QueryType_START) {};
+
+				RQL* db_create(std::string& name) {
+
+					com::rethinkdb::Term *term;
+					term = this->query.mutable_query();
+					term->set_type(com::rethinkdb::Term::TermType::Term_TermType_DB_CREATE);
+
+					com::rethinkdb::Term *term_name;
+					term_name = term->add_args();
+					term_name->set_type(com::rethinkdb::Term::TermType::Term_TermType_DATUM);
+
+					com::rethinkdb::Datum *datum;
+					datum = term_name->mutable_datum();
+					datum->set_type(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR);
+					datum->set_r_str(name);
+
+					return this;
+				}
+
+				Cursor run(connection& conn) {
+					// TODO - optargs?
+
+					// write query
+					conn.write_query(this->query);
+
+					// read response
+					std::shared_ptr<com::rethinkdb::Response> response(conn.read_response());
+
+					switch (response->type()) {
+						case com::rethinkdb::Response::ResponseType::Response_ResponseType_RUNTIME_ERROR:
+							throw runtime_error_exception("\n\nResponse received:\n" + response->DebugString());
+							break;
+						case com::rethinkdb::Response::ResponseType::Response_ResponseType_CLIENT_ERROR:
+							throw client_error_exception("\n\nResponse received:\n" + response->DebugString());
+							break;
+						case com::rethinkdb::Response::ResponseType::Response_ResponseType_COMPILE_ERROR:
+							throw compile_error_exception("\n\nResponse received:\n" + response->DebugString());
+							break;
+						default:
+							response->PrintDebugString();
+							// TODO
+					}
+
+				}
+				
+			private:
+				com::rethinkdb::Query query;
+
+		};
+
 
 		//
 		// implementation of connection class
@@ -97,40 +164,6 @@ namespace com {
 			}			
 		}
 
-		void connection::create_db(std::string db_name) {
-			com::rethinkdb::Query q = com::rethinkdb::Query();
-			q.set_type(com::rethinkdb::Query::QueryType::Query_QueryType_START);
-
-			// generate random token
-			q.set_token(rand());
-
-			com::rethinkdb::Term *t;
-			t = q.mutable_query();
-			t->set_type(com::rethinkdb::Term::TermType::Term_TermType_DB_CREATE);
-
-			com::rethinkdb::Term *t_name;
-			t_name = t->add_args();
-			t_name->set_type(com::rethinkdb::Term::TermType::Term_TermType_DATUM);
-
-			com::rethinkdb::Datum *datum;
-			datum = t_name->mutable_datum();
-			datum->set_type(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR);
-			datum->set_r_str(db_name);			
-
-			try {
-				// write query
-				write_query(q);
-
-				// read response
-				std::shared_ptr<com::rethinkdb::Response> response(read_response());
-				response->PrintDebugString();
-			}
-			catch (std::exception& e)
-			{
-				throw;
-			}
-		} 
-
 		std::shared_ptr<com::rethinkdb::Response> connection::read_response() {
 			u_int response_length;
 			char* reply;
@@ -160,7 +193,7 @@ namespace com {
 				delete[] reply;
 			}
 			catch (std::exception& e) {
-				throw connection_exception(boost::str(boost::format("Connection exception - read response: %1%") % e.what()));
+				throw connection_exception(boost::str(boost::format("Read response: %1%") % e.what()));
 			}
 
 			return response;
@@ -186,7 +219,7 @@ namespace com {
 			}
 			catch (std::exception& e)
 			{
-				throw connection_exception(boost::str(boost::format("Connection exception - write query: exception: %1%") % e.what()));
+				throw connection_exception(boost::str(boost::format("Write query: exception: %1%") % e.what()));
 			}
 		}
 	}
