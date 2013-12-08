@@ -6,8 +6,8 @@ using namespace std;
 int main(int argc, char* argv) {
 	cout << "Hello world" << endl;
 
-	std::shared_ptr <com::rethinkdb::connection> conn(new com::rethinkdb::connection("10.211.55.2", "28015", "test", "mojkluc"));
-	std::shared_ptr <com::rethinkdb::RQL> r(new com::rethinkdb::RQL());
+	std::shared_ptr <com::rethinkdb::driver::connection> conn(new com::rethinkdb::driver::connection("10.211.55.2", "28015", "test", "mojkluc"));
+	std::shared_ptr <com::rethinkdb::driver::RQL> r(new com::rethinkdb::driver::RQL());
 
 	try {
 		r->db_create("myDB")->run(conn);
