@@ -5,6 +5,8 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <stdlib.h>
+#include <stdexcept>
+#include <boost/format.hpp>
 
 // fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
 #if defined(_MSC_VER)
@@ -40,6 +42,8 @@ namespace com {
 				boost::asio::streambuf request_;
 				boost::asio::streambuf response_;
 
+				std::shared_ptr<com::rethinkdb::Response> read_response();
+				void write_query(const com::rethinkdb::Query& query);
 
 		};
 	}

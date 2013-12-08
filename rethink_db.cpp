@@ -1,5 +1,4 @@
 #include "rethink_db.hpp"
-#include <stdexcept>
 
 namespace com {
 	namespace rethinkdb {
@@ -53,30 +52,30 @@ namespace com {
 			try {
 				// resolve the host
 				boost::asio::ip::tcp::resolver::query query(this->host, this->port);
-				boost::asio::ip::tcp::resolver::iterator iterator = resolver_.resolve(query);
-				boost::asio::connect(socket_, iterator);
+				boost::asio::ip::tcp::resolver::iterator iterator = this->resolver_.resolve(query);
+				boost::asio::connect(this->socket_, iterator);
 
 				// prepare stream for writing data
-				std::ostream request_stream(&request_);
+				std::ostream request_stream(&(this->request_));
 
 				// write magic version number
 				request_stream.write((char*)&(com::rethinkdb::VersionDummy::V0_2), sizeof (com::rethinkdb::VersionDummy::V0_2));
 
 				// write auth_key length
-				u_int auth_key_length = auth_key.length();
+				u_int auth_key_length = this->auth_key.length();
 				request_stream.write((char*)&auth_key_length, sizeof (u_int));
 
 				// write auth_key
-				request_stream.write(auth_key.c_str(), auth_key.length());
+				request_stream.write(this->auth_key.c_str(), auth_key.length());
 
 				// send the request
-				boost::asio::write(socket_, request_);
+				boost::asio::write(this->socket_, this->request_);
 
 				// read response until a null character 
-				boost::asio::read_until(socket_, response_, 0);
+				boost::asio::read_until(this->socket_, this->response_, 0);
 
 				// prepare to read a response
-				std::istream response_stream(&response_);
+				std::istream response_stream(&(this->response_));
 				std::string response;
 				
 				// read one line of response
@@ -85,25 +84,25 @@ namespace com {
 				// if it starts with "SUCCESS"
 				if (response.substr(0, 7) == "SUCCESS") {
 					this->is_connected = true;
+					return true;
 				}
 				else {
 					this->is_connected = false;
 					throw connection_exception("Error while connecting to RethinkDB server: "  +  response);
 				}			
-			}
-			catch (std::exception& e)
+			} catch (std::exception& e)
 			{
 				// exception from boost has been caught
 				throw connection_exception(std::string(e.what()));
 			}			
 		}
 
-		
-		
 		void connection::create_db(std::string db_name) {
 			com::rethinkdb::Query q = com::rethinkdb::Query();
 			q.set_type(com::rethinkdb::Query::QueryType::Query_QueryType_START);
-			q.set_token(1);
+
+			// generate random token
+			q.set_token(rand());
 
 			com::rethinkdb::Term *t;
 			t = q.mutable_query();
@@ -118,50 +117,77 @@ namespace com {
 			datum->set_type(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR);
 			datum->set_r_str(db_name);			
 
-			std::ostream request_stream(&request_);
-			std::string blob = q.SerializeAsString();
-			
-			u_int blob_length = blob.length();
-			request_stream.write((char*)&blob_length, sizeof (u_int));
-
-			request_stream.write(blob.c_str(), blob.length());
 			try {
-				boost::asio::write(socket_, request_);
+				// write query
+				write_query(q);
 
-				//
 				// read response
-				//
-
-				// read response length
-				u_int response_length;
-
-				size_t read_length = boost::asio::read(socket_,
-					boost::asio::buffer(&response_length, sizeof(u_int)));
-				
-				// read protobuf
-				std::cout << "read_length: " << response_length << std::endl;
-
-				//read_length = 37;
-
-				char* reply = new char[response_length];
-				size_t reply_length = boost::asio::read(socket_,
-					boost::asio::buffer(reply, response_length));
-
-				std::cout << "reply_length: " << reply_length << std::endl;
-
-
-				com::rethinkdb::Response response = com::rethinkdb::Response();
-				response.ParseFromArray(reply, response_length);
-				delete[] reply;
-				response.PrintDebugString();
-
+				std::shared_ptr<com::rethinkdb::Response> response(read_response());
+				response->PrintDebugString();
 			}
 			catch (std::exception& e)
 			{
-				std::cerr << "Exception: " << e.what() << "\n";
+				throw;
+			}
+		} 
+
+		std::shared_ptr<com::rethinkdb::Response> connection::read_response() {
+			u_int response_length;
+			char* reply;
+			size_t bytes_read;
+			std::shared_ptr<com::rethinkdb::Response> response(new com::rethinkdb::Response());
+
+			try {
+				try {
+					// read length of the response
+					boost::asio::read(this->socket_, boost::asio::buffer(&response_length, sizeof(u_int)));
+
+					// read content
+					reply = new char[response_length];
+					bytes_read = boost::asio::read(this->socket_, boost::asio::buffer(reply, response_length));
+				} catch (std::exception& e) {
+					throw connection_exception("Unable to read from the socket.");
+				}			
+
+				if (bytes_read != response_length) throw connection_exception(boost::str(boost::format("%1% bytes read, when %2% bytes promised.") % bytes_read % response_length));
+
+				try {
+					response->ParseFromArray(reply, response_length);
+				} catch (std::exception& e) {
+					throw connection_exception("Unable to parse the protobuf Response object.");
+				}
+
+				delete[] reply;
+			}
+			catch (std::exception& e) {
+				throw connection_exception(boost::str(boost::format("Connection exception - read response: %1%") % e.what()));
 			}
 
+			return response;
+		}
 
-		} 
+		void connection::write_query(const com::rethinkdb::Query& query) {
+			// prepare output stream
+			std::ostream request_stream(&request_);
+
+			// serialize query
+			std::string blob = query.SerializeAsString();
+
+			// write blob's length in little endian 32 bit unsigned integer
+			u_int blob_length = blob.length();
+			request_stream.write((char*)&blob_length, sizeof (u_int));
+
+			// write protobuf blob
+			request_stream.write(blob.c_str(), blob.length());
+
+			try {
+				// send the content of the output stream over the wire
+				boost::asio::write(this->socket_, this->request_);
+			}
+			catch (std::exception& e)
+			{
+				throw connection_exception(boost::str(boost::format("Connection exception - write query: exception: %1%") % e.what()));
+			}
+		}
 	}
 }
