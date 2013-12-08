@@ -16,8 +16,8 @@
 typedef SSIZE_T ssize_t;
 #endif
 
-#ifndef RETHINK_DB_CONNECTION
-#define RETHINK_DB_CONNECTION
+#ifndef RETHINK_DB_DRIVER
+#define RETHINK_DB_DRIVER
 
 namespace com {
 	namespace rethinkdb {
@@ -204,51 +204,100 @@ namespace com {
 			// implementation data structures			
 			//
 
-			enum datum_type {
-				R_NULL,
-				R_BOOL,
-				R_NUM, // a double
-				R_STR,
-				R_ARRAY,
-				R_OBJECT
-			};
+			class array_datum;
+			class null_datum;
+			class bool_datum;
+			class num_datum;
+			class str_datum;
+			class array_datum;
+			class object_datum;
 
 			class datum {
 			public:
-				datum_type type;
-				datum(datum_type t) : type(t) {};
-			};
+				com::rethinkdb::Datum::DatumType type;
+				datum(com::rethinkdb::Datum::DatumType t) : type(t) {};
 
-			class null_datum : datum {
-				null_datum() : datum(datum_type::R_NULL) {};
+				std::shared_ptr<array_datum> to_array_datum() {
+					std::shared_ptr<datum> ptr(this);
+					return std::static_pointer_cast<array_datum> (ptr);
+				}
 			};
+			
 
+			class null_datum {
+			public:
+				null_datum();
+			};
+			
 			class bool_datum : datum {
+			public:
 				bool value;
-				bool_datum() : datum(datum_type::R_BOOL) {};
+				bool_datum(bool v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_BOOL), value(v) {};
 			};
 
 			class num_datum : datum {
+			public:
 				double value;
-				num_datum() : datum(datum_type::R_NUM) {};
+				num_datum(double v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NUM), value(v) {};
 			};
 
 			class str_datum : datum {
+			public:
 				std::string value;
-				str_datum() : datum(datum_type::R_STR) {};
+				str_datum(std::string v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR), value(v) {};
 			};
 
 			class array_datum : datum {
+			public:
 				std::vector<datum> value;
-				array_datum() : datum(datum_type::R_ARRAY) {};
+				array_datum() : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_ARRAY) {
+					value = std::vector<datum>();
+				};
 			};
 
 			class object_datum : datum {
+			public:
 				boost::unordered_map<std::string, datum> value;
-				object_datum() : datum(datum_type::R_OBJECT) {};
-			};
+				object_datum() : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_OBJECT) {
+					value = boost::unordered_map<std::string, datum>();
+				};
+			}; 							
 
+			
+			const com::rethinkdb::driver::datum& parse(const com::rethinkdb::Datum& input) {
+				/*std::shared_ptr<datum> output;
+				
+				switch (input.type()) {
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL:
+					output = std::make_shared<null_datum>(null_datum());
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_BOOL:
+					output = std::make_shared<bool_datum>(bool_datum(input.r_bool()));
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NUM:
+					output = std::make_shared<num_datum>(num_datum(input.r_num()));
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR:
+					output = std::make_shared<str_datum>(str_datum(input.r_str()));
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_ARRAY:
+					output = std::make_shared<array_datum>(array_datum());
+					for (int i = 0, s = input.r_array_size(); i < s; i++) {
+						//output->to_array_datum()->value.push_back(parse(input.r_array(i)));
+						//parse(&input.r_array(i));
+						//output.push_back(t);
+					}
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_OBJECT:
+					// TODO
+					break;
+				}
 
+				return output;
+				*/
+				return datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL);
+			}
+			
 
 			//
 			// implementation of RQL class				
@@ -302,10 +351,12 @@ namespace com {
 					case com::rethinkdb::Response::ResponseType::Response_ResponseType_COMPILE_ERROR:
 						throw compile_error_exception("\n\nResponse received:\n" + response->DebugString());
 						break;
-					default:
-						response->PrintDebugString();
-						// TODO
 					}
+
+					// if this point is reached, response is fine
+					response->PrintDebugString();
+
+
 
 				}
 
