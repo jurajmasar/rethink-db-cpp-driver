@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <boost/format.hpp>
 #include <vector>
+#include <boost/property_tree/ptree.hpp>
 
 // fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
 #if defined(_MSC_VER)
@@ -200,10 +201,33 @@ namespace com {
 		};
 
 		//
-		// implementation of query class				
+		// implementation of object class				
 		//
 
-		class object {}; // TODO
+		class object {
+			public:
+				object() : tree(boost::property_tree::ptree()) {};
+
+			private:
+				boost::property_tree::ptree tree;
+		}; 
+
+		//
+		// implementation of datum class				
+		//
+		
+		class datum {
+
+		};
+
+		template <class T>
+		class scalar_datum : datum {
+			T value;
+		};
+
+		//
+		// implementation of RQL class				
+		//
 
 		class RQL {
 			public:
