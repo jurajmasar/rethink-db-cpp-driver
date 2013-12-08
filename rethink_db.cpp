@@ -1,5 +1,5 @@
 #include "rethink_db.hpp"
-#include <exception>
+#include <stdexcept>
 
 namespace com {
 	namespace rethinkdb {
@@ -8,37 +8,29 @@ namespace com {
 		// definitions of exceptions
 		//
 
-		class connection_exception : public std::exception
-		{
-			virtual const char* what() const throw()
-			{
-				return "RethinkDB connection exception occurred.";
-			}
-		} connection_ex;
+		class connection_exception : public std::runtime_error{
+		public:
+			connection_exception() :runtime_error("RethinkDB connection exception occurred."){}
+			connection_exception(const std::string& msg) :runtime_error(msg.c_str()){}
+		};
 
-		class runtime_exception : public std::exception
-		{
-			virtual const char* what() const throw()
-			{
-				return "RethinkDB runtime exception occurred.";
-			}
-		} runtime_ex;
+		class runtime_error_exception : public std::runtime_error {
+		public:
+			runtime_error_exception() : runtime_error("RethinkDB runtime exception occurred."){}
+			runtime_error_exception(const std::string& msg) : runtime_error(msg.c_str()){}
+		};
 
-		class compile_error_exception : public std::exception
-		{
-			virtual const char* what() const throw()
-			{
-				return "RethinkDB compile error exception occurred.";
-			}
-		} compile_ex;
+		class compile_error_exception : public std::runtime_error {
+		public:
+			compile_error_exception() :runtime_error("RethinkDB compile error exception occurred."){}
+			compile_error_exception(const std::string& msg) :runtime_error(msg.c_str()){}
+		};
 
-		class client_error_exception : public std::exception
-		{
-			virtual const char* what() const throw()
-			{
-				return "RethinkDB client error exception occurred.";
-			}
-		} client_ex;
+		class client_error_exception : public std::runtime_error {
+		public:
+			client_error_exception() :runtime_error("RethinkDB client error exception occurred."){}
+			client_error_exception(const std::string& msg) :runtime_error(msg.c_str()){}
+		};
 
 		//
 		// implementation of connection class
@@ -50,46 +42,59 @@ namespace com {
 			this->database = database;
 			this->auth_key = auth_key;
 			this->is_connected = false;
+
+			this->connect();
 		}
 
-		void connection::connect() {
+		bool connection::connect() {
+
+			if (socket_.is_open() && this->is_connected) return true;
+
 			try {
+				// resolve the host
 				boost::asio::ip::tcp::resolver::query query(this->host, this->port);
 				boost::asio::ip::tcp::resolver::iterator iterator = resolver_.resolve(query);
 				boost::asio::connect(socket_, iterator);
 
+				// prepare stream for writing data
 				std::ostream request_stream(&request_);
 
-				// send magic version number
+				// write magic version number
 				request_stream.write((char*)&(com::rethinkdb::VersionDummy::V0_2), sizeof (com::rethinkdb::VersionDummy::V0_2));
 
-				// send auth_key length
+				// write auth_key length
 				u_int auth_key_length = auth_key.length();
 				request_stream.write((char*)&auth_key_length, sizeof (u_int));
 
-				// send auth_key
+				// write auth_key
 				request_stream.write(auth_key.c_str(), auth_key.length());
 
+				// send the request
 				boost::asio::write(socket_, request_);
 
+				// read response until a null character 
 				boost::asio::read_until(socket_, response_, 0);
 
+				// prepare to read a response
 				std::istream response_stream(&response_);
 				std::string response;
+				
+				// read one line of response
 				std::getline(response_stream, response);
+
+				// if it starts with "SUCCESS"
 				if (response.substr(0, 7) == "SUCCESS") {
-					std::cout << "Successfully connected." << std::endl;
-					std::cout << "Response: '" << response << "'\n";
 					this->is_connected = true;
 				}
 				else {
 					this->is_connected = false;
-					std::cout << "Error in handle_read_connect_response: '" << response << "'\n";
+					throw connection_exception("Error while connecting to RethinkDB server: "  +  response);
 				}			
 			}
 			catch (std::exception& e)
 			{
-				std::cerr << "Exception: " << e.what() << "\n";
+				// exception from boost has been caught
+				throw connection_exception(std::string(e.what()));
 			}			
 		}
 
