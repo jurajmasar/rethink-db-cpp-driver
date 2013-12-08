@@ -1,5 +1,5 @@
 #include <iostream>
-#include "rethink_db.hpp"
+#include "rethink_db.cpp"
 
 using namespace std;
 
