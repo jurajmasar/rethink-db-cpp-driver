@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <boost/format.hpp>
 #include <vector>
-#include <boost/property_tree/ptree.hpp>
+#include <boost/unordered_map.hpp>
 
 // fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
 #if defined(_MSC_VER)
@@ -201,30 +201,59 @@ namespace com {
 		};
 
 		//
-		// implementation of object class				
+		// implementation data structures			
 		//
 
-		class object {
-			public:
-				object() : tree(boost::property_tree::ptree()) {};
+		namespace data {
 
-			private:
-				boost::property_tree::ptree tree;
-		}; 
+			enum datum_type {
+				R_NULL,
+				R_BOOL,
+				R_NUM, // a double
+				R_STR,
+				R_ARRAY,
+				R_OBJECT
+			};
 
-		//
-		// implementation of datum class				
-		//
+			class datum {
+				public:
+					datum_type type;
+					datum(datum_type t) : type(t) {};
+			};
+
+			class null_datum : datum {
+				null_datum() : datum(datum_type::R_NULL) {};
+			};
+
+			class bool_datum : datum {
+				bool value;
+				bool_datum() : datum(datum_type::R_BOOL) {};
+			};
+
+			class num_datum : datum {
+				double value;
+				num_datum() : datum(datum_type::R_NUM) {};
+			};
+
+			class str_datum : datum {
+				std::string value;
+				str_datum() : datum(datum_type::R_STR) {};
+			};
+
+			class array_datum : datum {
+				std::vector<datum> value;
+				array_datum() : datum(datum_type::R_ARRAY) {};
+			};
+
+			class object_datum : datum {
+				std::vector<datum> value;
+				object_datum() : datum(datum_type::R_OBJECT) {};
+
+				boost::unordered_map<std::string, datum> value;
+			};
+		}
+
 		
-		class datum {
-
-		};
-
-		template <class T>
-		class scalar_datum : datum {
-			T value;
-		};
-
 		//
 		// implementation of RQL class				
 		//
@@ -258,7 +287,7 @@ namespace com {
 					return this;
 				}
 
-				std::vector<object> run(std::shared_ptr<connection> conn) {
+				std::vector<com::rethinkdb::data::datum> run(std::shared_ptr<connection> conn) {
 					// TODO - optargs?
 
 					// write query
