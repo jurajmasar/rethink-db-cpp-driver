@@ -7,6 +7,7 @@
 #define RETHINK_DB_DRIVER_RQL
 
 using namespace std;
+using namespace com::rethinkdb;
 
 namespace com {
 	namespace rethinkdb {
@@ -14,7 +15,7 @@ namespace com {
 
 			class RQL {
 			public:
-				RQL(com::rethinkdb::Query::QueryType query_type);
+				RQL(Query::QueryType query_type);
 
 				RQL();
 
@@ -23,7 +24,7 @@ namespace com {
 				std::vector<datum> run(std::shared_ptr<connection> conn);
 
 			private:
-				com::rethinkdb::Query query;
+				Query query;
 
 			};
 

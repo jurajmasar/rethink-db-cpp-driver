@@ -28,7 +28,7 @@ namespace com {
 					ostream request_stream(&(this->request_));
 
 					// write magic version number
-					request_stream.write((char*)&(com::rethinkdb::VersionDummy::V0_2), sizeof (com::rethinkdb::VersionDummy::V0_2));
+					request_stream.write((char*)&(VersionDummy::V0_2), sizeof (VersionDummy::V0_2));
 
 					// write auth_key length
 					u_int auth_key_length = this->auth_key.length();
@@ -67,11 +67,11 @@ namespace com {
 
 			}
 
-			shared_ptr<com::rethinkdb::Response> connection::read_response() {
+			shared_ptr<Response> connection::read_response() {
 				u_int response_length;
 				char* reply;
 				size_t bytes_read;
-				shared_ptr<com::rethinkdb::Response> response(new com::rethinkdb::Response());
+				shared_ptr<Response> response(new Response());
 
 				try {
 					try {
@@ -104,7 +104,7 @@ namespace com {
 				return response;
 			}
 
-			void connection::write_query(const com::rethinkdb::Query& query) {
+			void connection::write_query(const Query& query) {
 				// prepare output stream
 				ostream request_stream(&request_);
 
@@ -129,23 +129,23 @@ namespace com {
 			}
 
 
-			shared_ptr<datum> connection::parse(const com::rethinkdb::Datum& input) {
+			shared_ptr<datum> connection::parse(const Datum& input) {
 				/*shared_ptr<datum> output;
 
 				switch (input.type()) {
-				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL:
+				case Datum::DatumType::Datum_DatumType_R_NULL:
 					output = make_shared<null_datum>(null_datum());
 					break;
-				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_BOOL:
+				case Datum::DatumType::Datum_DatumType_R_BOOL:
 					output = make_shared<bool_datum>(bool_datum(input.r_bool()));
 					break;
-				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NUM:
+				case Datum::DatumType::Datum_DatumType_R_NUM:
 					output = make_shared<num_datum>(num_datum(input.r_num()));
 					break;
-				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR:
+				case Datum::DatumType::Datum_DatumType_R_STR:
 					output = make_shared<str_datum>(str_datum(input.r_str()));
 					break;
-				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_ARRAY:
+				case Datum::DatumType::Datum_DatumType_R_ARRAY:
 					output = make_shared<array_datum>(array_datum());
 					for (int i = 0, s = input.r_array_size(); i < s; i++) {
 						//output->to_array_datum()->value.push_back(parse(input.r_array(i)));
@@ -153,14 +153,14 @@ namespace com {
 						//output.push_back(t);
 					}
 					break;
-				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_OBJECT:
+				case Datum::DatumType::Datum_DatumType_R_OBJECT:
 					// TODO
 					break;
 				}
 
 				return output;
 				*/
-				return make_shared<datum>(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL);
+				return make_shared<datum>(Datum::DatumType::Datum_DatumType_R_NULL);
 			}
 
 		}

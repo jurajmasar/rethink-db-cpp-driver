@@ -11,6 +11,7 @@
 
 using namespace std;
 using namespace boost::asio;
+using namespace com::rethinkdb;
 
 namespace com {
 	namespace rethinkdb {
@@ -24,11 +25,11 @@ namespace com {
 
 				bool connect();
 
-				shared_ptr<com::rethinkdb::Response> read_response();
+				shared_ptr<Response> read_response();
 
-				void write_query(const com::rethinkdb::Query& query);
+				void write_query(const Query& query);
 
-				shared_ptr<datum> connection::parse(const com::rethinkdb::Datum& input);
+				shared_ptr<datum> connection::parse(const Datum& input);
 
 			private:
 

@@ -11,11 +11,11 @@ namespace com {
 				return std::static_pointer_cast<array_datum> (ptr);
 			}
 			
-			array_datum::array_datum() : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_ARRAY) {
+			array_datum::array_datum() : datum(Datum::DatumType::Datum_DatumType_R_ARRAY) {
 				value = std::vector<datum>();
 			};
 
-			object_datum::object_datum() : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_OBJECT) {
+			object_datum::object_datum() : datum(Datum::DatumType::Datum_DatumType_R_OBJECT) {
 				value = boost::unordered_map<std::string, datum>();
 			};
 

@@ -6,6 +6,7 @@
 #define RETHINK_DB_DRIVER_DATUM
 
 using namespace std;
+using namespace com::rethinkdb;
 
 namespace com {
 	namespace rethinkdb {
@@ -15,8 +16,8 @@ namespace com {
 
 			class datum {
 			public:
-				com::rethinkdb::Datum::DatumType type;
-				datum(com::rethinkdb::Datum::DatumType t) : type(t) {};
+				Datum::DatumType type;
+				datum(Datum::DatumType t) : type(t) {};
 
 				shared_ptr<array_datum> to_array_datum();
 			};
@@ -30,19 +31,19 @@ namespace com {
 			class bool_datum : datum {
 			public:
 				bool value;
-				bool_datum(bool v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_BOOL), value(v) {};
+				bool_datum(bool v) : datum(Datum::DatumType::Datum_DatumType_R_BOOL), value(v) {};
 			};
 
 			class num_datum : datum {
 			public:
 				double value;
-				num_datum(double v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NUM), value(v) {};
+				num_datum(double v) : datum(Datum::DatumType::Datum_DatumType_R_NUM), value(v) {};
 			};
 
 			class str_datum : datum {
 			public:
 				string value;
-				str_datum(string v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR), value(v) {};
+				str_datum(string v) : datum(Datum::DatumType::Datum_DatumType_R_STR), value(v) {};
 			};
 
 			class array_datum : datum {
