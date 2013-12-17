@@ -20,29 +20,29 @@ namespace com {
 
 			public:
 
-				connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key);
+				connection(const string& host, const string& port, const string& database, const string& auth_key);
 
 				bool connect();
 
-				std::shared_ptr<com::rethinkdb::Response> read_response();
+				shared_ptr<com::rethinkdb::Response> read_response();
 
 				void write_query(const com::rethinkdb::Query& query);
 
-				const com::rethinkdb::driver::datum& connection::parse(const com::rethinkdb::Datum& input);
+				shared_ptr<datum> connection::parse(const com::rethinkdb::Datum& input);
 
 			private:
 
-				std::string host;
-				std::string port;
-				std::string database;
-				std::string auth_key;
+				string host;
+				string port;
+				string database;
+				string auth_key;
 				int timeout;
 				int64_t token;
 				bool is_connected;
 
-				boost::asio::io_service io_service;
-				boost::asio::ip::tcp::resolver resolver_;
-				boost::asio::ip::tcp::socket socket_;
+				io_service io_service;
+				ip::tcp::resolver resolver_;
+				ip::tcp::socket socket_;
 				boost::asio::streambuf request_;
 				boost::asio::streambuf response_;
 			};

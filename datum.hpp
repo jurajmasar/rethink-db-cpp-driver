@@ -18,7 +18,7 @@ namespace com {
 				com::rethinkdb::Datum::DatumType type;
 				datum(com::rethinkdb::Datum::DatumType t) : type(t) {};
 
-				std::shared_ptr<array_datum> to_array_datum();
+				shared_ptr<array_datum> to_array_datum();
 			};
 
 
@@ -41,19 +41,19 @@ namespace com {
 
 			class str_datum : datum {
 			public:
-				std::string value;
-				str_datum(std::string v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR), value(v) {};
+				string value;
+				str_datum(string v) : datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR), value(v) {};
 			};
 
 			class array_datum : datum {
 			public:
-				std::vector<datum> value;
+				vector<datum> value;
 				array_datum();
 			};
 
 			class object_datum : datum {
 			public:
-				boost::unordered_map<std::string, datum> value;
+				boost::unordered_map<string, datum> value;
 				object_datum();
 			};
 

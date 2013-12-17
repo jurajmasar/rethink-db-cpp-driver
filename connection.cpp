@@ -4,7 +4,7 @@ namespace com {
 	namespace rethinkdb {
 		namespace driver {
 
-			connection::connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key) : resolver_(io_service), socket_(io_service) {
+			connection::connection(const string& host, const string& port, const string& database, const string& auth_key) : resolver_(io_service), socket_(io_service) {
 				this->host = host;
 				this->port = port;
 				this->database = database;
@@ -16,7 +16,7 @@ namespace com {
 
 				if (socket_.is_open() && this->is_connected) return true;
 
-				std::string response;
+				string response;
 
 				try {
 					// resolve the host
@@ -25,7 +25,7 @@ namespace com {
 					boost::asio::connect(this->socket_, iterator);
 
 					// prepare stream for writing data
-					std::ostream request_stream(&(this->request_));
+					ostream request_stream(&(this->request_));
 
 					// write magic version number
 					request_stream.write((char*)&(com::rethinkdb::VersionDummy::V0_2), sizeof (com::rethinkdb::VersionDummy::V0_2));
@@ -44,15 +44,15 @@ namespace com {
 					read_until(this->socket_, this->response_, 0);
 
 					// prepare to read a response
-					std::istream response_stream(&(this->response_));
+					istream response_stream(&(this->response_));
 
 					// read one line of response
-					std::getline(response_stream, response);
+					getline(response_stream, response);
 				}
-				catch (std::exception& e)
+				catch (exception& e)
 				{
 					// exception from boost has been caught
-					throw connection_exception(std::string(e.what()));
+					throw connection_exception(string(e.what()));
 				}
 
 				// if it starts with "SUCCESS"
@@ -67,11 +67,11 @@ namespace com {
 
 			}
 
-			std::shared_ptr<com::rethinkdb::Response> connection::read_response() {
+			shared_ptr<com::rethinkdb::Response> connection::read_response() {
 				u_int response_length;
 				char* reply;
 				size_t bytes_read;
-				std::shared_ptr<com::rethinkdb::Response> response(new com::rethinkdb::Response());
+				shared_ptr<com::rethinkdb::Response> response(new com::rethinkdb::Response());
 
 				try {
 					try {
@@ -82,7 +82,7 @@ namespace com {
 						reply = new char[response_length];
 						bytes_read = read(this->socket_, buffer(reply, response_length));
 					}
-					catch (std::exception&) {
+					catch (exception&) {
 						throw connection_exception("Unable to read from the socket.");
 					}
 
@@ -91,13 +91,13 @@ namespace com {
 					try {
 						response->ParseFromArray(reply, response_length);
 					}
-					catch (std::exception&) {
+					catch (exception&) {
 						throw connection_exception("Unable to parse the protobuf Response object.");
 					}
 
 					delete[] reply;
 				}
-				catch (std::exception& e) {
+				catch (exception& e) {
 					throw connection_exception(boost::str(boost::format("Read response: %1%") % e.what()));
 				}
 
@@ -106,10 +106,10 @@ namespace com {
 
 			void connection::write_query(const com::rethinkdb::Query& query) {
 				// prepare output stream
-				std::ostream request_stream(&request_);
+				ostream request_stream(&request_);
 
 				// serialize query
-				std::string blob = query.SerializeAsString();
+				string blob = query.SerializeAsString();
 
 				// write blob's length in little endian 32 bit unsigned integer
 				u_int blob_length = blob.length();
@@ -122,45 +122,45 @@ namespace com {
 					// send the content of the output stream over the wire
 					write(this->socket_, this->request_);
 				}
-				catch (std::exception& e)
+				catch (exception& e)
 				{
 					throw connection_exception(boost::str(boost::format("Write query: exception: %1%") % e.what()));
 				}
 			}
 
 
-			const com::rethinkdb::driver::datum& connection::parse(const com::rethinkdb::Datum& input) {
-			/*std::shared_ptr<datum> output;
+			shared_ptr<datum> connection::parse(const com::rethinkdb::Datum& input) {
+				/*shared_ptr<datum> output;
 
-			switch (input.type()) {
-			case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL:
-			output = std::make_shared<null_datum>(null_datum());
-			break;
-			case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_BOOL:
-			output = std::make_shared<bool_datum>(bool_datum(input.r_bool()));
-			break;
-			case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NUM:
-			output = std::make_shared<num_datum>(num_datum(input.r_num()));
-			break;
-			case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR:
-			output = std::make_shared<str_datum>(str_datum(input.r_str()));
-			break;
-			case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_ARRAY:
-			output = std::make_shared<array_datum>(array_datum());
-			for (int i = 0, s = input.r_array_size(); i < s; i++) {
-			//output->to_array_datum()->value.push_back(parse(input.r_array(i)));
-			//parse(&input.r_array(i));
-			//output.push_back(t);
-			}
-			break;
-			case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_OBJECT:
-			// TODO
-			break;
-			}
+				switch (input.type()) {
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL:
+					output = make_shared<null_datum>(null_datum());
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_BOOL:
+					output = make_shared<bool_datum>(bool_datum(input.r_bool()));
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NUM:
+					output = make_shared<num_datum>(num_datum(input.r_num()));
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_STR:
+					output = make_shared<str_datum>(str_datum(input.r_str()));
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_ARRAY:
+					output = make_shared<array_datum>(array_datum());
+					for (int i = 0, s = input.r_array_size(); i < s; i++) {
+						//output->to_array_datum()->value.push_back(parse(input.r_array(i)));
+						//parse(&input.r_array(i));
+						//output.push_back(t);
+					}
+					break;
+				case com::rethinkdb::Datum::DatumType::Datum_DatumType_R_OBJECT:
+					// TODO
+					break;
+				}
 
-			return output;
-			*/
-			return datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL);
+				return output;
+				*/
+				return make_shared<datum>(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL);
 			}
 
 		}

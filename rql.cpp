@@ -13,7 +13,7 @@ namespace com {
 				this->query.set_token(rand());
 			}
 
-			RQL* RQL::db_create(const std::string& name) {
+			RQL* RQL::db_create(const string& name) {
 
 				com::rethinkdb::Term *term;
 				term = this->query.mutable_query();
@@ -31,7 +31,7 @@ namespace com {
 				return this;
 			}
 
-			std::vector<datum> RQL::run(std::shared_ptr<connection> conn) {
+			vector<datum> RQL::run(shared_ptr<connection> conn) {
 				conn->connect();
 
 				// TODO - optargs?
@@ -40,7 +40,7 @@ namespace com {
 				conn->write_query(this->query);
 
 				// read response
-				std::shared_ptr<com::rethinkdb::Response> response(conn->read_response());
+				shared_ptr<com::rethinkdb::Response> response(conn->read_response());
 
 				switch (response->type()) {
 				case com::rethinkdb::Response::ResponseType::Response_ResponseType_RUNTIME_ERROR:
@@ -58,7 +58,7 @@ namespace com {
 				response->PrintDebugString();
 
 				// TODO
-				return std::vector<datum>();
+				return vector<datum>();
 			}
 
 		}
