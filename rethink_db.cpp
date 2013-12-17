@@ -312,8 +312,8 @@ namespace com {
 					// if this point is reached, response is fine
 					response->PrintDebugString();
 
-
-
+					// TODO
+					return std::vector<datum>();
 				}
 
 			private:
