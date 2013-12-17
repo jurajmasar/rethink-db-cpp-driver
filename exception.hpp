@@ -8,9 +8,6 @@ using namespace std;
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
-			//
-			// definitions of exceptions
-			//
 
 			class connection_exception : public runtime_error{
 			public:

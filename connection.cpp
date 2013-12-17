@@ -4,11 +4,6 @@ namespace com {
 	namespace rethinkdb {
 		namespace driver {
 
-			//
-			// implementation of connection class
-			//
-
-			
 			connection::connection(const std::string& host, const std::string& port, const std::string& database, const std::string& auth_key) : resolver_(io_service), socket_(io_service) {
 				this->host = host;
 				this->port = port;
@@ -134,7 +129,7 @@ namespace com {
 			}
 
 
-			/*const com::rethinkdb::driver::datum& parse(const com::rethinkdb::Datum& input) {
+			const com::rethinkdb::driver::datum& connection::parse(const com::rethinkdb::Datum& input) {
 			/*std::shared_ptr<datum> output;
 
 			switch (input.type()) {
@@ -164,9 +159,9 @@ namespace com {
 			}
 
 			return output;
-
+			*/
 			return datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL);
-			}*/
+			}
 
 		}
 	}

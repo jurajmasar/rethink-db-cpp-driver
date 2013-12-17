@@ -5,9 +5,6 @@ using namespace std;
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
-			//
-			// implementation data structures			
-			//
 
 			std::shared_ptr<array_datum> datum::to_array_datum() {
 				std::shared_ptr<datum> ptr(this);

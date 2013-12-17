@@ -11,9 +11,6 @@ using namespace std;
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
-			//
-			// implementation of RQL class				
-			//
 
 			class RQL {
 			public:

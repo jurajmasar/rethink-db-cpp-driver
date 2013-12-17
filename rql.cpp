@@ -3,12 +3,7 @@
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
-			
-			
-			//
-			// implementation of RQL class				
-			//
-
+		
 			RQL::RQL() : RQL(com::rethinkdb::Query::QueryType::Query_QueryType_START) {};
 			
 			RQL::RQL(com::rethinkdb::Query::QueryType query_type) : query(com::rethinkdb::Query()) {
