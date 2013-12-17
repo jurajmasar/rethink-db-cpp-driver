@@ -25,34 +25,34 @@ namespace com {
 
 			class null_datum : public datum {
 			public:
-				null_datum();
+				null_datum() : datum(Datum::DatumType::Datum_DatumType_R_NULL) {};
 			};
 
-			class bool_datum : datum {
+			class bool_datum : public datum {
 			public:
 				bool value;
 				bool_datum(bool v) : datum(Datum::DatumType::Datum_DatumType_R_BOOL), value(v) {};
 			};
 
-			class num_datum : datum {
+			class num_datum : public datum {
 			public:
 				double value;
 				num_datum(double v) : datum(Datum::DatumType::Datum_DatumType_R_NUM), value(v) {};
 			};
 
-			class str_datum : datum {
+			class str_datum : public datum {
 			public:
 				string value;
 				str_datum(string v) : datum(Datum::DatumType::Datum_DatumType_R_STR), value(v) {};
 			};
 
-			class array_datum : datum {
+			class array_datum : public datum {
 			public:
 				vector<datum> value;
 				array_datum();
 			};
 
-			class object_datum : datum {
+			class object_datum : public datum {
 			public:
 				boost::unordered_map<string, datum> value;
 				object_datum();
