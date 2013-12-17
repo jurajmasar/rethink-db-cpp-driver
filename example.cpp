@@ -1,5 +1,5 @@
 #include <iostream>
-#include "rethink_db.cpp"
+#include "rethink_db.hpp"
 
 using namespace std;
 using namespace com::rethinkdb::driver;
@@ -10,7 +10,7 @@ int main(int argc, char* argv) {
 	shared_ptr <RQL> r(new RQL());
 
 	try {
-		r->db_create("myDB3")->run(conn);
+		r->db_create("myDB6")->run(conn);
 	} catch (runtime_error& e) {
 		cerr << e.what() << endl;
 	}

@@ -76,11 +76,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="connection.cpp" />
+    <ClCompile Include="datum.cpp" />
     <ClCompile Include="example.cpp" />
+    <ClCompile Include="exception.cpp" />
     <ClCompile Include="proto\ql2.pb.cc" />
     <ClCompile Include="rethink_db.cpp" />
+    <ClCompile Include="rql.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="connection.hpp" />
+    <ClInclude Include="datum.hpp" />
+    <ClInclude Include="exception.hpp" />
     <ClInclude Include="include\google\protobuf\compiler\code_generator.h" />
     <ClInclude Include="include\google\protobuf\compiler\command_line_interface.h" />
     <ClInclude Include="include\google\protobuf\compiler\cpp\cpp_generator.h" />
@@ -123,6 +130,7 @@
     <ClInclude Include="include\google\protobuf\wire_format_lite_inl.h" />
     <ClInclude Include="proto\ql2.pb.h" />
     <ClInclude Include="rethink_db.hpp" />
+    <ClInclude Include="rql.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
