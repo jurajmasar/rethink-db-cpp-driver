@@ -1,55 +1,9 @@
-#include "proto\ql2.pb.h"
-#include <string>
-#include <stdio.h>
-#include <stdint.h>
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <stdlib.h>
-#include <stdexcept>
-#include <boost/format.hpp>
-#include <vector>
-#include <boost/unordered_map.hpp>
-
-// fix for undefined ssize_t from https://code.google.com/p/cpp-btree/issues/detail?id=6
-#if defined(_MSC_VER)
-#include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
-#endif
-
-#ifndef RETHINK_DB_DRIVER
-#define RETHINK_DB_DRIVER
+#include "rethink_db.hpp"
 
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
-			//
-			// definitions of exceptions
-			//
-
-			class connection_exception : public std::runtime_error{
-			public:
-				connection_exception() :runtime_error(""){}
-				connection_exception(const std::string& msg) : runtime_error(("RethinkDB connection exception. " + msg).c_str()){}
-			};
-
-			class runtime_error_exception : public std::runtime_error {
-			public:
-				runtime_error_exception() : runtime_error(""){}
-				runtime_error_exception(const std::string& msg) : runtime_error(("RethinkDB runtime exception. " + msg).c_str()){}
-			};
-
-			class compile_error_exception : public std::runtime_error {
-			public:
-				compile_error_exception() :runtime_error(""){}
-				compile_error_exception(const std::string& msg) : runtime_error(("RethinkDB compile error exception. " + msg).c_str()){}
-			};
-
-			class client_error_exception : public std::runtime_error {
-			public:
-				client_error_exception() :runtime_error(""){}
-				client_error_exception(const std::string& msg) : runtime_error(("RethinkDB client error exception. " + msg).c_str()){}
-			};
-
+			
 
 			//
 			// implementation of connection class
@@ -65,13 +19,13 @@ namespace com {
 					this->database = database;
 					this->auth_key = auth_key;
 					this->is_connected = false;
-
-					this->connect();
 				}
 
 				bool connect() {
 
 					if (socket_.is_open() && this->is_connected) return true;
+
+					std::string response;
 
 					try {
 						// resolve the host
@@ -99,27 +53,27 @@ namespace com {
 						boost::asio::read_until(this->socket_, this->response_, 0);
 
 						// prepare to read a response
-						std::istream response_stream(&(this->response_));
-						std::string response;
+						std::istream response_stream(&(this->response_));						
 
 						// read one line of response
 						std::getline(response_stream, response);
-
-						// if it starts with "SUCCESS"
-						if (response.substr(0, 7) == "SUCCESS") {
-							this->is_connected = true;
-							return true;
-						}
-						else {
-							this->is_connected = false;
-							throw connection_exception("Error while connecting to RethinkDB server: " + response);
-						}
 					}
 					catch (std::exception& e)
 					{
 						// exception from boost has been caught
 						throw connection_exception(std::string(e.what()));
 					}
+
+					// if it starts with "SUCCESS"
+					if (response.substr(0, 7) == "SUCCESS") {
+						this->is_connected = true;
+						return true;
+					}
+					else {
+						this->is_connected = false;
+						throw connection_exception(response);
+					}
+					
 				}
 
 				std::shared_ptr<com::rethinkdb::Response> read_response() {
@@ -137,7 +91,7 @@ namespace com {
 							reply = new char[response_length];
 							bytes_read = boost::asio::read(this->socket_, boost::asio::buffer(reply, response_length));
 						}
-						catch (std::exception& e) {
+						catch (std::exception&) {
 							throw connection_exception("Unable to read from the socket.");
 						}
 
@@ -146,7 +100,7 @@ namespace com {
 						try {
 							response->ParseFromArray(reply, response_length);
 						}
-						catch (std::exception& e) {
+						catch (std::exception&) {
 							throw connection_exception("Unable to parse the protobuf Response object.");
 						}
 
@@ -264,7 +218,7 @@ namespace com {
 			}; 							
 
 			
-			const com::rethinkdb::driver::datum& parse(const com::rethinkdb::Datum& input) {
+			/*const com::rethinkdb::driver::datum& parse(const com::rethinkdb::Datum& input) {
 				/*std::shared_ptr<datum> output;
 				
 				switch (input.type()) {
@@ -294,9 +248,9 @@ namespace com {
 				}
 
 				return output;
-				*/
+				
 				return datum(com::rethinkdb::Datum::DatumType::Datum_DatumType_R_NULL);
-			}
+			}*/
 			
 
 			//
@@ -333,6 +287,8 @@ namespace com {
 				}
 
 				std::vector<datum> run(std::shared_ptr<connection> conn) {
+					conn->connect();
+
 					// TODO - optargs?
 
 					// write query
@@ -369,5 +325,3 @@ namespace com {
 		}
 	}
 }
-
-#endif

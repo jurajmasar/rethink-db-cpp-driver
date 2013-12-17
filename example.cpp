@@ -2,18 +2,18 @@
 #include "rethink_db.cpp"
 
 using namespace std;
+using namespace com::rethinkdb::driver;
 
 int main(int argc, char* argv) {
-	cout << "Hello world" << endl;
 
-	std::shared_ptr <com::rethinkdb::driver::connection> conn(new com::rethinkdb::driver::connection("10.211.55.2", "28015", "test", "mojkluc"));
-	std::shared_ptr <com::rethinkdb::driver::RQL> r(new com::rethinkdb::driver::RQL());
+	shared_ptr <connection> conn(new connection("10.211.55.2", "28015", "test", "mojkluc"));
+	shared_ptr <RQL> r(new RQL());
 
 	try {
 		r->db_create("myDB")->run(conn);
-	} catch (std::runtime_error& e) {
-		cerr << "An error occurred: " << e.what() << std::endl;
+	} catch (runtime_error& e) {
+		cerr << e.what() << endl;
 	}
-
+	
 	return 0;
 }
