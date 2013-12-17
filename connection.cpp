@@ -148,17 +148,17 @@ namespace com {
 				case Datum::DatumType::Datum_DatumType_R_ARRAY:
 					output = make_shared<array_datum>(array_datum());
 					for (int i = 0, s = input.r_array_size(); i < s; i++) {
-						//output->to_array_datum()->value.push_back(parse(input.r_array(i)));
-						//parse(&input.r_array(i));
-						//output.push_back(t);
+						output->to_array_datum()->value.push_back(parse(input.r_array(i)));		
 					}
 					break;
 				case Datum::DatumType::Datum_DatumType_R_OBJECT:
-					// TODO
+					output = make_shared<object_datum>(object_datum());
+					for (int i = 0, s = input.r_object_size(); i < s; i++) {
+						pair < string, shared_ptr < datum >> assoc_pair (input.r_object(i).key(), parse(input.r_object(i).val()));
+					    output->to_object_datum()->value.insert(assoc_pair);
+					}
 					break;
-				
 				}
-
 
 				return output;				
 			}

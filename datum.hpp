@@ -13,6 +13,7 @@ namespace com {
 		namespace driver {
 
 			class array_datum;
+			class object_datum;
 
 			class datum {
 			public:
@@ -20,6 +21,8 @@ namespace com {
 				datum(Datum::DatumType t) : type(t) {};
 
 				shared_ptr<array_datum> to_array_datum();
+
+				shared_ptr<object_datum> to_object_datum();
 			};
 
 
@@ -48,13 +51,13 @@ namespace com {
 
 			class array_datum : public datum {
 			public:
-				vector<datum> value;
+				vector<shared_ptr<datum>> value;
 				array_datum();
 			};
 
 			class object_datum : public datum {
 			public:
-				boost::unordered_map<string, datum> value;
+				boost::unordered_map<string, shared_ptr<datum>> value;
 				object_datum();
 			};
 
