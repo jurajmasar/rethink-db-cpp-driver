@@ -130,16 +130,16 @@ namespace com {
 
 
 			shared_ptr<datum> connection::parse(const Datum& input) {
-				/*shared_ptr<datum> output;
+				shared_ptr<datum> output;
 
 				switch (input.type()) {
 				case Datum::DatumType::Datum_DatumType_R_NULL:
 					output = make_shared<null_datum>(null_datum());
 					break;
-				case Datum::DatumType::Datum_DatumType_R_BOOL:
+				/*case Datum::DatumType::Datum_DatumType_R_BOOL:
 					output = make_shared<bool_datum>(bool_datum(input.r_bool()));
 					break;
-				case Datum::DatumType::Datum_DatumType_R_NUM:
+				/*case Datum::DatumType::Datum_DatumType_R_NUM:
 					output = make_shared<num_datum>(num_datum(input.r_num()));
 					break;
 				case Datum::DatumType::Datum_DatumType_R_STR:
@@ -156,11 +156,11 @@ namespace com {
 				case Datum::DatumType::Datum_DatumType_R_OBJECT:
 					// TODO
 					break;
+				*/
 				}
 
-				return output;
-				*/
-				return make_shared<datum>(Datum::DatumType::Datum_DatumType_R_NULL);
+
+				return output;				
 			}
 
 		}

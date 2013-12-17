@@ -23,7 +23,7 @@ namespace com {
 			};
 
 
-			class null_datum {
+			class null_datum : public datum {
 			public:
 				null_datum();
 			};
