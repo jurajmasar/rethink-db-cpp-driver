@@ -1,4 +1,5 @@
 #include "proto\ql2.pb.h"
+#include <vector>
 #include "exception.hpp"
 #include "connection.hpp"
 
@@ -12,36 +13,45 @@ namespace com {
 	namespace rethinkdb {
 		namespace driver {
 			
-			class RQL {
-			public:
+			class RQL_Array;
+			class RQL_Object;
+			class RQL_String;
+			class RQL { // "Top" according to photobuf specification
+			public:			
 
-				RQL();
-				RQL(Query::QueryType query_type);
-				RQL::RQL(Query::QueryType query_type, size_t token);
+				RQL::RQL() : term(Term()) {};
 
-				/* -------------------------------------------------------------------- */
-
-				shared_ptr<Response> RQL::run(shared_ptr<connection> conn);
-				shared_ptr<Response> read_more(shared_ptr<connection> conn);
+				vector<shared_ptr<Response>> RQL::run(shared_ptr<connection> conn);				
 
 				/* -------------------------------------------------------------------- */
-
+				/*
 				RQL* db(const string& db_name);
-				RQL* db_create(const string& db_name);
 				RQL* db_drop(const string& db_name);
-				RQL* db_list();
+						
+				*/
+				shared_ptr<RQL_Array> db_list();
+				shared_ptr<RQL_Object> db_create(shared_ptr<RQL_String> db_name);
+			
+			protected:				
+
+				void check_response(shared_ptr<Response> response);
 
 				/* -------------------------------------------------------------------- */
-
-				RQL* table_list();
-
-			private:
-				Query query;
-				shared_ptr<Response> response;
-
-				void add_term_datum_string(Term* term, const string& str);
+			
+				Term term;
 			};
 
+			class RQL_Datum : public RQL {};
+			class RQL_String : public RQL_Datum {
+			public:
+				RQL_String(const string& str) {
+					term.set_type(Term::TermType::Term_TermType_DATUM);
+					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_STR);
+					term.mutable_datum()->set_r_str(str);
+				}
+			};
+			class RQL_Array : public RQL_Datum {};
+			class RQL_Object : public RQL_Datum {};
 		}
 	}
 }

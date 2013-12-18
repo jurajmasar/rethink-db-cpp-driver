@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #include "rethink_db.hpp"
 
 using namespace std;
@@ -16,8 +18,8 @@ string ask(const string& description) {
 int main(int argc, char* argv) {
 
 	shared_ptr <connection> conn(new connection("10.211.55.2", "28015", "test", ""));
-	shared_ptr<Response> response = 0;
-
+	vector<shared_ptr<Response>> responses = vector<shared_ptr<Response>>();
+	
 	string action;
 
 	while (!cin.eof()) {
@@ -35,16 +37,23 @@ int main(int argc, char* argv) {
 				break;
 			}
 			else if (action == "db_create") {
-				response = (new RQL())->db_create(ask("db_name"))->run(conn);
+				responses = (new RQL())->db_create(make_shared<RQL_String>(RQL_String(ask("db_name"))))->run(conn);
 			}
-			else if (action == "db_drop") {
-				response = (new RQL())->db_drop(ask("db_name"))->run(conn);
+			/*else if (action == "db_drop") {
+				responses = (new RQL())->db_drop(ask("db_name"))->run(conn);
 			}
-			else if (action == "db_list") {
-				response = (new RQL())->db_list()->run(conn);
+			*/else if (action == "db_list") {
+				responses = (new RQL())->db_list()->run(conn);
+			}
+			else {
+				cout << "Invalid action." << endl << endl;
+				responses = vector<shared_ptr<Response>>();
 			}
 
-			if (response != 0) response->PrintDebugString();
+			for_each(responses.begin(), responses.end(), [] (shared_ptr<Response> response) {
+				response->PrintDebugString();
+			});
+			
 		}
 		catch (runtime_error& e) {
 			cerr << e.what() << endl;
@@ -54,7 +63,7 @@ int main(int argc, char* argv) {
 		cout << endl;
 		cout << "========================================================================" << endl << endl;
 	}
-
+	
 	conn->close();
 
 	return 0;

@@ -3,29 +3,53 @@
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
-		
-			RQL::RQL() : RQL(Query::QueryType::Query_QueryType_START) {};
 			
-			RQL::RQL(Query::QueryType query_type) : RQL(query_type, rand()) {}
-
-			RQL::RQL(Query::QueryType query_type, size_t token) : query(Query()) {
-				this->query.set_type(query_type);
-
-				// generate random token
-				this->query.set_token(token);
-			}
-
-			shared_ptr<Response> RQL::run(shared_ptr<connection> conn) {
+			vector<shared_ptr<Response>> RQL::run(shared_ptr<connection> conn) {
 				conn->connect();
 
 				// TODO - optargs?
 
+				vector<shared_ptr<Response>> responses = vector<shared_ptr<Response>>();
+				shared_ptr<Response> response;
+
+				Query query;
+				query.set_type(Query::QueryType::Query_QueryType_START);				
+				// generate random token
+				query.set_token(rand());
+
+				*(query.mutable_query()) = term;
+
 				// write query
-				conn->write_query(this->query);
+				conn->write_query(query);
 
 				// read response
 				response = conn->read_response();
+				this->check_response(response);
 
+				// if this point is reached, response is fine
+
+				responses.push_back(response);
+
+				query.set_type(Query::QueryType::Query_QueryType_CONTINUE);
+				query.clear_query();
+
+				while (response->type() == Response::ResponseType::Response_ResponseType_SUCCESS_PARTIAL) {
+					// write query
+					conn->write_query(query);
+
+					// read response
+					response = conn->read_response();
+					this->check_response(response);
+
+					responses.push_back(response);
+				}
+
+				return responses;
+			}
+
+			/* -------------------------------------------------------------------- */
+
+			void RQL::check_response(shared_ptr<Response> response) {
 				switch (response->type()) {
 				case Response::ResponseType::Response_ResponseType_RUNTIME_ERROR:
 					throw runtime_error_exception("\n\nResponse received:\n" + response->DebugString());
@@ -37,58 +61,47 @@ namespace com {
 					throw compile_error_exception("\n\nResponse received:\n" + response->DebugString());
 					break;
 				}
-
-				// if this point is reached, response is fine
-
-				return response;
-			}
-
-			shared_ptr<Response> RQL::read_more(shared_ptr<connection> conn) {
-				if (response->type() != Response::ResponseType::Response_ResponseType_SUCCESS_PARTIAL) throw connection_exception("No more data to read in the response.");
-
-				this->query.set_type(Query::QueryType::Query_QueryType_CONTINUE);
-
-				return this->run(conn);
 			}
 
 			/* -------------------------------------------------------------------- */
 
-			void RQL::add_term_datum_string(Term* term, const string& str) {
-				term->set_type(Term::TermType::Term_TermType_DATUM);
-				term->mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_STR);
-				term->mutable_datum()->set_r_str(str);
+			shared_ptr<RQL_Array> RQL::db_list() {
+				shared_ptr<RQL_Array> array(new RQL_Array());
+				array->term.set_type(Term::TermType::Term_TermType_DB_LIST);
+				return array;
 			}
 
-			/* -------------------------------------------------------------------- */
+			shared_ptr<RQL_Object> RQL::db_create(shared_ptr<RQL_String> db_name) {
+				shared_ptr<RQL_Object> object(new RQL_Object());
+				object->term.set_type(Term::TermType::Term_TermType_DB_CREATE);
+				*(object->term.add_args()) = db_name->term;
+				return object;
+			}
+
+			/*
 
 			RQL* RQL::db(const string& db_name) {
 				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB);
 				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
 			}
 
-			RQL* RQL::db_create(const string& db_name) {
-				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB_CREATE);
-				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
-				return this;
-			}
-
 			RQL* RQL::db_drop(const string& db_name) {
 				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB_DROP);
 				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
 				return this;
-			}
+			}			
 
-			RQL* RQL::db_list() {
-				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB_LIST);
-				return this;
-			}
+			RQL* RQL::table_list() {		
 
-			/* -------------------------------------------------------------------- */
-
-			RQL* RQL::table_list() {			
+				Term *term = this->query.release_query();
 				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_TABLE_LIST);
+				this->query.mutable_query()->add_args();
+					
+					//->set_type(Term::TermType::Term_TermType_TABLE_LIST);
 				return this;
 			}
+
+			*/
 		}
 	}
 }

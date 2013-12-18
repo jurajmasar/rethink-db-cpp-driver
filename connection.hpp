@@ -43,7 +43,6 @@ namespace com {
 				string database;
 				string auth_key;
 				int timeout;
-				int64_t token;
 				bool connection_established;
 
 				io_service io_service;
