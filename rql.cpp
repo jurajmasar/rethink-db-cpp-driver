@@ -61,16 +61,20 @@ namespace com {
 
 			/* -------------------------------------------------------------------- */
 
+			RQL* RQL::db(const string& db_name) {
+				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB);
+				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
+			}
 
-			RQL* RQL::db_create(const string& name) {
+			RQL* RQL::db_create(const string& db_name) {
 				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB_CREATE);
-				this->add_term_datum_string(this->query.mutable_query()->add_args(), name);
+				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
 				return this;
 			}
 
-			RQL* RQL::db_drop(const string& name) {
+			RQL* RQL::db_drop(const string& db_name) {
 				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB_DROP);
-				this->add_term_datum_string(this->query.mutable_query()->add_args(), name);
+				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
 				return this;
 			}
 
@@ -79,6 +83,12 @@ namespace com {
 				return this;
 			}
 
+			/* -------------------------------------------------------------------- */
+
+			RQL* RQL::table_list() {			
+				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_TABLE_LIST);
+				return this;
+			}
 		}
 	}
 }

@@ -19,12 +19,21 @@ namespace com {
 				RQL(Query::QueryType query_type);
 				RQL::RQL(Query::QueryType query_type, size_t token);
 
+				/* -------------------------------------------------------------------- */
+
 				shared_ptr<Response> RQL::run(shared_ptr<connection> conn);
 				shared_ptr<Response> read_more(shared_ptr<connection> conn);
 
-				RQL* db_create(const std::string& name);
-				RQL* db_drop(const std::string& name);
+				/* -------------------------------------------------------------------- */
+
+				RQL* db(const string& db_name);
+				RQL* db_create(const string& db_name);
+				RQL* db_drop(const string& db_name);
 				RQL* db_list();
+
+				/* -------------------------------------------------------------------- */
+
+				RQL* table_list();
 
 			private:
 				Query query;
