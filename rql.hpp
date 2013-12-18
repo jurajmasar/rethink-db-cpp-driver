@@ -16,21 +16,21 @@ namespace com {
 			public:
 
 				RQL();
-
 				RQL(Query::QueryType query_type);
-
 				RQL::RQL(Query::QueryType query_type, size_t token);
 
-				RQL* db_create(const std::string& name);
-
 				shared_ptr<Response> RQL::run(shared_ptr<connection> conn);
-
 				shared_ptr<Response> read_more(shared_ptr<connection> conn);
+
+				RQL* db_create(const std::string& name);
+				RQL* db_drop(const std::string& name);
 
 
 			private:
 				Query query;
 				shared_ptr<Response> response;
+
+				void add_term_datum_string(Term* term, const string& str);
 			};
 
 		}
