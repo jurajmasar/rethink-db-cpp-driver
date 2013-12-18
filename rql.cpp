@@ -6,11 +6,13 @@ namespace com {
 		
 			RQL::RQL() : RQL(Query::QueryType::Query_QueryType_START) {};
 			
-			RQL::RQL(Query::QueryType query_type) : query(Query()) {
+			RQL::RQL(Query::QueryType query_type) : RQL(query_type, rand()) {}
+
+			RQL::RQL(Query::QueryType query_type, size_t token) : query(Query()) {
 				this->query.set_type(query_type);
 
 				// generate random token
-				this->query.set_token(rand());
+				this->query.set_token(token);
 			}
 
 			RQL* RQL::db_create(const string& name) {
@@ -31,7 +33,7 @@ namespace com {
 				return this;
 			}
 
-			vector<datum> RQL::run(shared_ptr<connection> conn) {
+			shared_ptr<Response> RQL::run(shared_ptr<connection> conn) {
 				conn->connect();
 
 				// TODO - optargs?
@@ -40,7 +42,7 @@ namespace com {
 				conn->write_query(this->query);
 
 				// read response
-				shared_ptr<Response> response(conn->read_response());
+				response = conn->read_response();
 
 				switch (response->type()) {
 				case Response::ResponseType::Response_ResponseType_RUNTIME_ERROR:
@@ -57,8 +59,15 @@ namespace com {
 				// if this point is reached, response is fine
 				response->PrintDebugString();
 
-				// TODO
-				return vector<datum>();
+				return response;
+			}
+
+			shared_ptr<Response> RQL::read_more(shared_ptr<connection> conn) {
+				if (response->type() != Response::ResponseType::Response_ResponseType_SUCCESS_PARTIAL) throw connection_exception("No more data to read in the response.");
+
+				this->query.set_type(Query::QueryType::Query_QueryType_CONTINUE);
+
+				return this->run(conn);
 			}
 
 		}

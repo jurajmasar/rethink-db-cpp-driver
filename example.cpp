@@ -2,6 +2,7 @@
 #include "rethink_db.hpp"
 
 using namespace std;
+using namespace com::rethinkdb;
 using namespace com::rethinkdb::driver;
 
 int main(int argc, char* argv) {
@@ -10,7 +11,10 @@ int main(int argc, char* argv) {
 	shared_ptr <RQL> r(new RQL());
 
 	try {
-		r->db_create("myDB6")->run(conn);
+		shared_ptr<Response> response = r->db_create("myDB110")->run(conn);
+
+		cout << response->response(0).r_object(0).key() << ":" << response->response(0).r_object(0).val().r_num() << endl;
+
 	} catch (runtime_error& e) {
 		cerr << e.what() << endl;
 	}

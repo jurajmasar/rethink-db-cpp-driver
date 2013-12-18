@@ -77,7 +77,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="connection.cpp" />
-    <ClCompile Include="datum.cpp" />
     <ClCompile Include="example.cpp" />
     <ClCompile Include="exception.cpp" />
     <ClCompile Include="proto\ql2.pb.cc" />
@@ -86,7 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="connection.hpp" />
-    <ClInclude Include="datum.hpp" />
     <ClInclude Include="exception.hpp" />
     <ClInclude Include="include\google\protobuf\compiler\code_generator.h" />
     <ClInclude Include="include\google\protobuf\compiler\command_line_interface.h" />

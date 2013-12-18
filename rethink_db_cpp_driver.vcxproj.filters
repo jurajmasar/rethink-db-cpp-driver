@@ -27,9 +27,6 @@
     <ClCompile Include="rql.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="datum.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="connection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -165,9 +162,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rql.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="datum.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="connection.hpp">

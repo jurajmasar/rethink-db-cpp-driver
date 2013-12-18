@@ -3,8 +3,6 @@
 #include <string>
 #include <boost/format.hpp>
 #include "exception.hpp"
-#include "datum.hpp"
-
 
 #ifndef RETHINK_DB_DRIVER_CONNECTION
 #define RETHINK_DB_DRIVER_CONNECTION
@@ -12,6 +10,7 @@
 using namespace std;
 using namespace boost::asio;
 using namespace com::rethinkdb;
+using namespace com::rethinkdb::driver;
 
 namespace com {
 	namespace rethinkdb {
@@ -28,8 +27,6 @@ namespace com {
 				shared_ptr<Response> read_response();
 
 				void write_query(const Query& query);
-
-				shared_ptr<datum> connection::parse(const Datum& input);
 
 			private:
 
