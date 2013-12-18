@@ -20,12 +20,15 @@ int main(int argc, char* argv) {
 
 	while (!cin.eof()) {
 		try {
-			cout << "Possible actions: db_create db_drop exit" << endl;
+			cout << "Possible actions: db_create db_drop db_list exit" << endl;
 			cout << endl;
 
 			string action = ask("action");
 
-			if (action == "exit") {
+			if (action.length() == 0) {
+				continue;
+			}
+			else if (action == "exit") {
 				cout << "Exiting..." << endl << endl;
 				break;
 			}
@@ -34,6 +37,9 @@ int main(int argc, char* argv) {
 			}
 			else if (action == "db_drop") {
 				response = (new RQL())->db_drop(ask("db_name"))->run(conn);
+			}
+			else if (action == "db_list") {
+				response = (new RQL())->db_list()->run(conn);
 			}
 
 			response->PrintDebugString();

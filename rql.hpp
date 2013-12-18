@@ -24,7 +24,7 @@ namespace com {
 
 				RQL* db_create(const std::string& name);
 				RQL* db_drop(const std::string& name);
-
+				RQL* db_list();
 
 			private:
 				Query query;

@@ -74,6 +74,11 @@ namespace com {
 				return this;
 			}
 
+			RQL* RQL::db_list() {
+				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB_LIST);
+				return this;
+			}
+
 		}
 	}
 }
