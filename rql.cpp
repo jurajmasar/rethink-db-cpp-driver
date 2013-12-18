@@ -78,18 +78,27 @@ namespace com {
 				return object;
 			}
 
+			shared_ptr<RQL_Object> RQL::db_create(const string& db_name) {
+				return db_create(make_shared<RQL_String>(RQL_String(db_name)));
+			}
+
+			shared_ptr<RQL_Object> RQL::db_drop(shared_ptr<RQL_String> db_name) {
+				shared_ptr<RQL_Object> object(new RQL_Object());
+				object->term.set_type(Term::TermType::Term_TermType_DB_DROP);
+				*(object->term.add_args()) = db_name->term;
+				return object;
+			}
+
+			shared_ptr<RQL_Object> RQL::db_drop(const string& db_name) {
+				return db_drop(make_shared<RQL_String>(RQL_String(db_name)));
+			}
+
 			/*
 
 			RQL* RQL::db(const string& db_name) {
 				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB);
 				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
-			}
-
-			RQL* RQL::db_drop(const string& db_name) {
-				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB_DROP);
-				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
-				return this;
-			}			
+			}		
 
 			RQL* RQL::table_list() {		
 

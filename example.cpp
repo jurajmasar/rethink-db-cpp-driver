@@ -37,12 +37,12 @@ int main(int argc, char* argv) {
 				break;
 			}
 			else if (action == "db_create") {
-				responses = (new RQL())->db_create(make_shared<RQL_String>(RQL_String(ask("db_name"))))->run(conn);
+				responses = (new RQL())->db_create(ask("db_name"))->run(conn);
 			}
-			/*else if (action == "db_drop") {
+			else if (action == "db_drop") {
 				responses = (new RQL())->db_drop(ask("db_name"))->run(conn);
 			}
-			*/else if (action == "db_list") {
+			else if (action == "db_list") {
 				responses = (new RQL())->db_list()->run(conn);
 			}
 			else {

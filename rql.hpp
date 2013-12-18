@@ -24,13 +24,16 @@ namespace com {
 				vector<shared_ptr<Response>> RQL::run(shared_ptr<connection> conn);				
 
 				/* -------------------------------------------------------------------- */
+				
 				/*
-				RQL* db(const string& db_name);
-				RQL* db_drop(const string& db_name);
-						
+				RQL* db(const string& db_name);						
 				*/
+
 				shared_ptr<RQL_Array> db_list();
 				shared_ptr<RQL_Object> db_create(shared_ptr<RQL_String> db_name);
+				shared_ptr<RQL_Object> db_create(const string& db_name);
+				shared_ptr<RQL_Object> db_drop(shared_ptr<RQL_String> db_name);
+				shared_ptr<RQL_Object> db_drop(const string& db_name);
 			
 			protected:				
 
