@@ -21,11 +21,12 @@ namespace com {
 			public:
 
 				connection(const string& host, const string& port, const string& database, const string& auth_key);
-
+				
+				bool is_connected();
+				bool reconnect();
 				bool connect();
 
 				shared_ptr<Response> read_response();
-
 				void write_query(const Query& query);
 
 			private:
@@ -36,7 +37,7 @@ namespace com {
 				string auth_key;
 				int timeout;
 				int64_t token;
-				bool is_connected;
+				bool connection_established;
 
 				io_service io_service;
 				ip::tcp::resolver resolver_;

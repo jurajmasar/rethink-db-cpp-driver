@@ -9,12 +9,20 @@ namespace com {
 				this->port = port;
 				this->database = database;
 				this->auth_key = auth_key;
-				this->is_connected = false;
+				this->connection_established = false;
+			}
+
+			bool connection::is_connected() {
+				return (socket_.is_open() && this->connection_established);
+			}
+
+			bool connection::reconnect() {
+				return this->connect();
 			}
 
 			bool connection::connect() {
 
-				if (socket_.is_open() && this->is_connected) return true;
+				if (this->is_connected()) return true;
 
 				string response;
 
@@ -57,11 +65,11 @@ namespace com {
 
 				// if it starts with "SUCCESS"
 				if (response.substr(0, 7) == "SUCCESS") {
-					this->is_connected = true;
+					this->connection_established = true;
 					return true;
 				}
 				else {
-					this->is_connected = false;
+					this->connection_established = false;
 					throw connection_exception(response);
 				}
 
