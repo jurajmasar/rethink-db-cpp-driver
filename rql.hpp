@@ -16,6 +16,7 @@ namespace com {
 			class RQL_Array;
 			class RQL_Object;
 			class RQL_String;
+			class RQL_Database;
 			class RQL { // "Top" according to photobuf specification
 			public:			
 
@@ -24,24 +25,23 @@ namespace com {
 				vector<shared_ptr<Response>> RQL::run(shared_ptr<connection> conn);				
 
 				/* -------------------------------------------------------------------- */
-				
-				/*
-				RQL* db(const string& db_name);						
-				*/
 
+				shared_ptr<RQL_Database> db(shared_ptr<RQL_String> db_name);
+				shared_ptr<RQL_Database> db(const string& db_name);
 				shared_ptr<RQL_Array> db_list();
 				shared_ptr<RQL_Object> db_create(shared_ptr<RQL_String> db_name);
 				shared_ptr<RQL_Object> db_create(const string& db_name);
 				shared_ptr<RQL_Object> db_drop(shared_ptr<RQL_String> db_name);
 				shared_ptr<RQL_Object> db_drop(const string& db_name);
-			
+
+				/* -------------------------------------------------------------------- */
+
+				Term term;
+
 			protected:				
 
 				void check_response(shared_ptr<Response> response);
 
-				/* -------------------------------------------------------------------- */
-			
-				Term term;
 			};
 
 			class RQL_Datum : public RQL {};
@@ -55,6 +55,16 @@ namespace com {
 			};
 			class RQL_Array : public RQL_Datum {};
 			class RQL_Object : public RQL_Datum {};
+
+			class RQL_Database : public RQL {
+			public:
+				shared_ptr<RQL_Array> table_list() {
+					shared_ptr<RQL_Array> array(new RQL_Array());
+					array->term.set_type(Term::TermType::Term_TermType_TABLE_LIST);
+					*(array->term.add_args()) = this->term;
+					return array;
+				}
+			};
 		}
 	}
 }

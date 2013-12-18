@@ -65,6 +65,17 @@ namespace com {
 
 			/* -------------------------------------------------------------------- */
 
+			shared_ptr<RQL_Database> RQL::db(shared_ptr<RQL_String> db_name) {
+				shared_ptr<RQL_Database> object(new RQL_Database());
+				object->term.set_type(Term::TermType::Term_TermType_DB);
+				*(object->term.add_args()) = db_name->term;
+				return object;
+			};
+
+			shared_ptr<RQL_Database> RQL::db(const string& db_name) {
+				return db(make_shared<RQL_String>(db_name));
+			};
+
 			shared_ptr<RQL_Array> RQL::db_list() {
 				shared_ptr<RQL_Array> array(new RQL_Array());
 				array->term.set_type(Term::TermType::Term_TermType_DB_LIST);

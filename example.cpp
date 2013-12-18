@@ -24,7 +24,7 @@ int main(int argc, char* argv) {
 
 	while (!cin.eof()) {
 		try {
-			cout << "Possible actions: db_create db_drop db_list exit" << endl;
+			cout << "Possible actions: db_create db_drop db_list table_list exit" << endl;
 			cout << endl;
 
 			action = ask("action");
@@ -44,6 +44,9 @@ int main(int argc, char* argv) {
 			}
 			else if (action == "db_list") {
 				responses = (new RQL())->db_list()->run(conn);
+			}
+			else if (action == "table_list") {
+				responses = (new RQL())->db(ask("db_name"))->table_list()->run(conn);
 			}
 			else {
 				cout << "Invalid action." << endl << endl;
@@ -68,3 +71,5 @@ int main(int argc, char* argv) {
 
 	return 0;
 }
+
+// conn->r()->db_create(ask("db_name"))->run();
