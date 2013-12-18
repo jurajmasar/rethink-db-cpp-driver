@@ -80,7 +80,6 @@
     <ClCompile Include="example.cpp" />
     <ClCompile Include="exception.cpp" />
     <ClCompile Include="proto\ql2.pb.cc" />
-    <ClCompile Include="rethink_db.cpp" />
     <ClCompile Include="rql.cpp" />
   </ItemGroup>
   <ItemGroup>

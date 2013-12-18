@@ -55,5 +55,7 @@ int main(int argc, char* argv) {
 		cout << "========================================================================" << endl << endl;
 	}
 
+	conn->close();
+
 	return 0;
 }

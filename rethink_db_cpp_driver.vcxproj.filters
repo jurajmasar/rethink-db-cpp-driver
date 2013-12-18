@@ -18,9 +18,6 @@
     <ClCompile Include="proto\ql2.pb.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rethink_db.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

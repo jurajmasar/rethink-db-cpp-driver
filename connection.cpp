@@ -75,6 +75,19 @@ namespace com {
 
 			}
 
+			void connection::close() {
+				this->socket_.close();
+				this->connection_established = false;
+			}
+
+			/* -------------------------------------------------------------------- */
+
+			void connection::use(const string& db_name) {
+				this->database = db_name;
+			}
+
+			/* -------------------------------------------------------------------- */
+
 			shared_ptr<Response> connection::read_response() {
 				u_int response_length;
 				char* reply;

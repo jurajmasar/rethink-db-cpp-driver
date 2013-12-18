@@ -25,6 +25,13 @@ namespace com {
 				bool is_connected();
 				bool reconnect();
 				bool connect();
+				void close();
+				
+				/* -------------------------------------------------------------------- */
+
+				void use(const string& db_name);
+
+				/* -------------------------------------------------------------------- */
 
 				shared_ptr<Response> read_response();
 				void write_query(const Query& query);
