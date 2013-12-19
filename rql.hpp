@@ -18,6 +18,7 @@ namespace com {
 			class RQL_Object;
 			class RQL_String;
 			class RQL_Database;
+			class RQL_Table;
 			class RQL { // "Top" according to photobuf specification
 			public:			
 
@@ -37,6 +38,8 @@ namespace com {
 
 				/* -------------------------------------------------------------------- */
 
+				virtual shared_ptr<RQL_Table> table(shared_ptr<RQL_String> table_name);
+				virtual shared_ptr<RQL_Table> table(const string& table_name);
 				virtual shared_ptr<RQL_Object> table_create(shared_ptr<RQL_String> table_name);
 				virtual shared_ptr<RQL_Object> table_create(const string& table_name);
 				virtual shared_ptr<RQL_Array> table_drop(shared_ptr<RQL_String> table_name);
@@ -105,8 +108,8 @@ namespace com {
 
 			class RQL_Database : public RQL {
 			public:
-				shared_ptr<RQL_Object> table(shared_ptr<RQL_String> table_name) {
-					shared_ptr<RQL_Object> object(new RQL_Object());
+				shared_ptr<RQL_Table> table(shared_ptr<RQL_String> table_name) {
+					shared_ptr<RQL_Table> object(new RQL_Table());
 					object->term.set_type(Term::TermType::Term_TermType_TABLE);
 					*(object->term.add_args()) = this->term;
 					*(object->term.add_args()) = table_name->term;
@@ -114,7 +117,7 @@ namespace com {
 					return object;
 				}
 
-				shared_ptr<RQL_Object> table(const string& table_name) {
+				shared_ptr<RQL_Table> table(const string& table_name) {
 					return table(make_shared<RQL_String>(RQL_String(table_name)));
 				}
 

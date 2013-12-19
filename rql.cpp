@@ -111,6 +111,14 @@ namespace com {
 
 			/* -------------------------------------------------------------------- */
 
+			shared_ptr<RQL_Table> RQL::table(shared_ptr<RQL_String> table_name) {
+				return db(this->conn->database)->table(table_name);
+			}
+
+			shared_ptr<RQL_Table> RQL::table(const string& table_name) {
+				return db(this->conn->database)->table(make_shared<RQL_String>(RQL_String(table_name)));
+			}
+
 			shared_ptr<RQL_Object> RQL::table_create(shared_ptr<RQL_String> table_name) {
 				return db(this->conn->database)->table_create(table_name);
 			}
