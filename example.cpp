@@ -37,16 +37,16 @@ int main(int argc, char* argv) {
 				break;
 			}
 			else if (action == "db_create") {
-				responses = (new RQL())->db_create(ask("db_name"))->run(conn);
+				responses = conn->r()->db_create(ask("db_name"))->run();
 			}
 			else if (action == "db_drop") {
-				responses = (new RQL())->db_drop(ask("db_name"))->run(conn);
+				responses = conn->r()->db_drop(ask("db_name"))->run();
 			}
 			else if (action == "db_list") {
-				responses = (new RQL())->db_list()->run(conn);
+				responses = conn->r()->db_list()->run();
 			}
 			else if (action == "table_list") {
-				responses = (new RQL())->db(ask("db_name"))->table_list()->run(conn);
+				responses = conn->r()->db(ask("db_name"))->table_list()->run();
 			}
 			else {
 				cout << "Invalid action." << endl << endl;

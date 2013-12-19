@@ -1,10 +1,11 @@
+#include "connection.hpp"
 #include "rql.hpp"
 
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
 			
-			vector<shared_ptr<Response>> RQL::run(shared_ptr<connection> conn) {
+			vector<shared_ptr<Response>> RQL::run() {
 				conn->connect();
 
 				// TODO - optargs?
@@ -69,6 +70,7 @@ namespace com {
 				shared_ptr<RQL_Database> object(new RQL_Database());
 				object->term.set_type(Term::TermType::Term_TermType_DB);
 				*(object->term.add_args()) = db_name->term;
+				object->conn = this->conn;
 				return object;
 			};
 
@@ -79,6 +81,7 @@ namespace com {
 			shared_ptr<RQL_Array> RQL::db_list() {
 				shared_ptr<RQL_Array> array(new RQL_Array());
 				array->term.set_type(Term::TermType::Term_TermType_DB_LIST);
+				array->conn = this->conn;
 				return array;
 			}
 
@@ -86,6 +89,7 @@ namespace com {
 				shared_ptr<RQL_Object> object(new RQL_Object());
 				object->term.set_type(Term::TermType::Term_TermType_DB_CREATE);
 				*(object->term.add_args()) = db_name->term;
+				object->conn = this->conn;
 				return object;
 			}
 
@@ -97,31 +101,13 @@ namespace com {
 				shared_ptr<RQL_Object> object(new RQL_Object());
 				object->term.set_type(Term::TermType::Term_TermType_DB_DROP);
 				*(object->term.add_args()) = db_name->term;
+				object->conn = this->conn;
 				return object;
 			}
 
 			shared_ptr<RQL_Object> RQL::db_drop(const string& db_name) {
 				return db_drop(make_shared<RQL_String>(RQL_String(db_name)));
 			}
-
-			/*
-
-			RQL* RQL::db(const string& db_name) {
-				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_DB);
-				this->add_term_datum_string(this->query.mutable_query()->add_args(), db_name);
-			}		
-
-			RQL* RQL::table_list() {		
-
-				Term *term = this->query.release_query();
-				this->query.mutable_query()->set_type(Term::TermType::Term_TermType_TABLE_LIST);
-				this->query.mutable_query()->add_args();
-					
-					//->set_type(Term::TermType::Term_TermType_TABLE_LIST);
-				return this;
-			}
-
-			*/
 		}
 	}
 }

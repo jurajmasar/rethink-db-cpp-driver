@@ -1,7 +1,7 @@
 #include "proto\ql2.pb.h"
 #include <vector>
 #include "exception.hpp"
-#include "connection.hpp"
+#include <memory>
 
 #ifndef RETHINK_DB_DRIVER_RQL
 #define RETHINK_DB_DRIVER_RQL
@@ -13,6 +13,7 @@ namespace com {
 	namespace rethinkdb {
 		namespace driver {
 			
+			class connection;
 			class RQL_Array;
 			class RQL_Object;
 			class RQL_String;
@@ -22,7 +23,7 @@ namespace com {
 
 				RQL::RQL() : term(Term()) {};
 
-				vector<shared_ptr<Response>> RQL::run(shared_ptr<connection> conn);				
+				vector<shared_ptr<Response>> RQL::run();				
 
 				/* -------------------------------------------------------------------- */
 
@@ -37,6 +38,7 @@ namespace com {
 				/* -------------------------------------------------------------------- */
 
 				Term term;
+				shared_ptr <connection> conn;
 
 			protected:				
 
@@ -62,6 +64,7 @@ namespace com {
 					shared_ptr<RQL_Array> array(new RQL_Array());
 					array->term.set_type(Term::TermType::Term_TermType_TABLE_LIST);
 					*(array->term.add_args()) = this->term;
+					array->conn = this->conn;
 					return array;
 				}
 			};

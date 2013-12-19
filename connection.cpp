@@ -24,7 +24,7 @@ namespace com {
 
 				if (this->is_connected()) return true;
 
-				string response;
+				string response;			
 
 				try {
 					// resolve the host
@@ -147,6 +147,14 @@ namespace com {
 				{
 					throw connection_exception(boost::str(boost::format("Write query: exception: %1%") % e.what()));
 				}
+			}
+
+			/* -------------------------------------------------------------------- */
+
+			shared_ptr<RQL> connection::r() {
+				shared_ptr<RQL> ptr(new RQL());
+				ptr->conn = shared_from_this();
+				return ptr;
 			}
 		}
 	}

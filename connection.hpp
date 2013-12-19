@@ -3,6 +3,7 @@
 #include <string>
 #include <boost/format.hpp>
 #include "exception.hpp"
+#include "rql.hpp"
 
 #ifndef RETHINK_DB_DRIVER_CONNECTION
 #define RETHINK_DB_DRIVER_CONNECTION
@@ -15,8 +16,8 @@ using namespace com::rethinkdb::driver;
 namespace com {
 	namespace rethinkdb {
 		namespace driver {
-
-			class connection {
+			
+			class connection : public enable_shared_from_this<connection> {
 
 			public:
 
@@ -36,14 +37,18 @@ namespace com {
 				shared_ptr<Response> read_response();
 				void write_query(const Query& query);
 
-			private:
+				/* -------------------------------------------------------------------- */
+
+				shared_ptr<RQL> r();
+
 
 				string host;
 				string port;
 				string database;
 				string auth_key;
-				int timeout;
 				bool connection_established;
+
+			private:
 
 				io_service io_service;
 				ip::tcp::resolver resolver_;
