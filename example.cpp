@@ -41,13 +41,19 @@ int main(int argc, char* argv) {
 	while (!cin.eof()) {
 		try {
 			responses = vector<shared_ptr<Response>>();
-			std::cout << "Possible actions: use db_create db_drop db_list table_list exit" << endl;
+			std::cout << endl;
+			std::cout << "========================================================================" << endl;
+			std::cout << "  Possible actions:" << endl;
+			std::cout << "    db_create db_drop db_list use" << endl;
+			std::cout << "    table_drop table_list" << endl;
+			std::cout << "    exit" << endl;
+			std::cout << "========================================================================" << endl << endl;
 			std::cout << endl;
 
 			action = ask("action");
 
 			if (action.length() == 0) {
-				continue;
+				std::cout << "Invalid action." << endl;
 			}
 			else if (action == "exit") {
 				std::cout << "Exiting..." << endl << endl;
@@ -65,6 +71,15 @@ int main(int argc, char* argv) {
 			}
 			else if (action == "db_list") {
 				responses = conn->r()->db_list()->run();
+			}
+			else if (action == "table_drop") {
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				if (db_name == "") {
+					responses = conn->r()->table_drop(ask("table_name"))->run();
+				}
+				else {
+					responses = conn->r()->db(db_name)->table_drop(ask("table_name"))->run();
+				}
 			}
 			else if (action == "table_list") {
 				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
@@ -89,8 +104,6 @@ int main(int argc, char* argv) {
 		}
 
 		action = "";
-		std::cout << endl;
-		std::cout << "========================================================================" << endl << endl;
 	}
 	
 	conn->close();
