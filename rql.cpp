@@ -108,6 +108,12 @@ namespace com {
 			shared_ptr<RQL_Object> RQL::db_drop(const string& db_name) {
 				return db_drop(make_shared<RQL_String>(RQL_String(db_name)));
 			}
+
+			/* -------------------------------------------------------------------- */
+
+			shared_ptr<RQL_Array> RQL::table_list() {
+				return db(this->conn->database)->table_list();
+			}
 		}
 	}
 }

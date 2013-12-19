@@ -41,14 +41,14 @@ namespace com {
 
 				shared_ptr<RQL> r();
 
+				string database;
+
+			private:
 
 				string host;
 				string port;
-				string database;
 				string auth_key;
 				bool connection_established;
-
-			private:
 
 				io_service io_service;
 				ip::tcp::resolver resolver_;

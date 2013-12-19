@@ -1,31 +1,48 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include "rethink_db.hpp"
+
+#define default_host "10.211.55.2"
+#define default_port "28015"
+#define default_db "test"
+#define default_auth_key ""
 
 using namespace std;
 using namespace com::rethinkdb;
 using namespace com::rethinkdb::driver;
 
 string ask(const string& description) {
-	cout << "> " << description << ": ";
+	std::cout << "> " << description << ": ";
 	string input = "";
 	getline(cin, input);
-	cout << endl;
+	std::cout << endl;
+	boost::algorithm::trim(input);
 	return input;
 }
 
 int main(int argc, char* argv) {
 
-	shared_ptr <connection> conn(new connection("10.211.55.2", "28015", "test", ""));
+	string host = ask("host (leave empty for '" default_host "')");
+	if (host.empty()) host = default_host;
+	string port = ask("port (leave empty for '" default_port "')");
+	if (port.empty()) port = default_port;
+	string db = ask("default database (leave empty for '" default_db "')");
+	if (db.empty()) db = default_db;
+	string auth_key = ask("authorization key (leave empty for '" default_auth_key "')");
+	if (auth_key.empty()) auth_key = default_auth_key;
+
+	shared_ptr <connection> conn(new connection(host, port, db, auth_key));
 	vector<shared_ptr<Response>> responses = vector<shared_ptr<Response>>();
 	
 	string action;
 
 	while (!cin.eof()) {
 		try {
-			cout << "Possible actions: db_create db_drop db_list table_list exit" << endl;
-			cout << endl;
+			responses = vector<shared_ptr<Response>>();
+			std::cout << "Possible actions: use db_create db_drop db_list table_list exit" << endl;
+			std::cout << endl;
 
 			action = ask("action");
 
@@ -33,8 +50,12 @@ int main(int argc, char* argv) {
 				continue;
 			}
 			else if (action == "exit") {
-				cout << "Exiting..." << endl << endl;
+				std::cout << "Exiting..." << endl << endl;
 				break;
+			}
+			else if (action == "use") {
+				conn->use(ask("db_name"));
+				std::cout << endl << "Default database has been changed." << endl;
 			}
 			else if (action == "db_create") {
 				responses = conn->r()->db_create(ask("db_name"))->run();
@@ -46,11 +67,16 @@ int main(int argc, char* argv) {
 				responses = conn->r()->db_list()->run();
 			}
 			else if (action == "table_list") {
-				responses = conn->r()->db(ask("db_name"))->table_list()->run();
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				if (db_name == "") {
+					responses = conn->r()->table_list()->run();
+				}
+				else {
+					responses = conn->r()->db(db_name)->table_list()->run();
+				}
 			}
 			else {
-				cout << "Invalid action." << endl << endl;
-				responses = vector<shared_ptr<Response>>();
+				std::cout << "Invalid action." << endl;
 			}
 
 			for_each(responses.begin(), responses.end(), [] (shared_ptr<Response> response) {
@@ -63,8 +89,8 @@ int main(int argc, char* argv) {
 		}
 
 		action = "";
-		cout << endl;
-		cout << "========================================================================" << endl << endl;
+		std::cout << endl;
+		std::cout << "========================================================================" << endl << endl;
 	}
 	
 	conn->close();
