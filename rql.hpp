@@ -37,6 +37,8 @@ namespace com {
 
 				/* -------------------------------------------------------------------- */
 
+				virtual shared_ptr<RQL_Object> table_create(shared_ptr<RQL_String> table_name);
+				virtual shared_ptr<RQL_Object> table_create(const string& table_name);
 				virtual shared_ptr<RQL_Array> table_drop(shared_ptr<RQL_String> table_name);
 				virtual shared_ptr<RQL_Array> table_drop(const string& table_name);
 				virtual shared_ptr<RQL_Array> table_list();
@@ -66,6 +68,19 @@ namespace com {
 
 			class RQL_Database : public RQL {
 			public:
+				shared_ptr<RQL_Object> table_create(shared_ptr<RQL_String> table_name) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_TABLE_CREATE);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = table_name->term;
+					object->conn = this->conn;
+					return object;
+				}
+
+				shared_ptr<RQL_Object> table_create(const string& table_name) {
+					return table_create(make_shared<RQL_String>(RQL_String(table_name)));
+				}
+
 				shared_ptr<RQL_Array> table_drop(shared_ptr<RQL_String> table_name) {
 					shared_ptr<RQL_Array> array(new RQL_Array());
 					array->term.set_type(Term::TermType::Term_TermType_TABLE_DROP);
