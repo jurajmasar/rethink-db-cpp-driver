@@ -54,7 +54,33 @@ namespace com {
 
 			};
 
+			class RQL_Function : public RQL {};
+			class RQL_Ordering : public RQL {};
+			class RQL_Pathspec : public RQL {};
+
+			class RQL_Sequence : public RQL {};
+			class RQL_Stream : public RQL_Sequence {};
+			class RQL_Stream_Selection : public RQL_Stream {};
+			class RQL_Table : public RQL_Stream_Selection {};
+
 			class RQL_Datum : public RQL {};
+			class RQL_Null : public RQL_Datum {};
+			class RQL_Bool : public RQL_Datum {
+			public:
+				RQL_Bool(bool b) {
+					term.set_type(Term::TermType::Term_TermType_DATUM);
+					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_BOOL);
+					term.mutable_datum()->set_r_bool(b);
+				}
+			};
+			class RQL_Number : public RQL_Datum {
+			public:
+				RQL_Number(double number) {
+					term.set_type(Term::TermType::Term_TermType_DATUM);
+					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_NUM);
+					term.mutable_datum()->set_r_num(number);
+				}
+			};
 			class RQL_String : public RQL_Datum {
 			public:
 				RQL_String(const string& str) {
@@ -63,11 +89,35 @@ namespace com {
 					term.mutable_datum()->set_r_str(str);
 				}
 			};
-			class RQL_Array : public RQL_Datum {};
-			class RQL_Object : public RQL_Datum {};
+			class RQL_Array : public RQL_Datum {
+			public:
+				RQL_Array() {}
+
+				RQL_Array(vector<shared_ptr<RQL_Datum>> params) {
+					term.set_type(Term::TermType::Term_TermType_MAKE_ARRAY);
+					for_each(params.begin(), params.end(), [this](shared_ptr<RQL_Datum> datum) {
+						*(term.add_args()) = datum->term;
+					}); 
+				}
+			};
+			class RQL_Object : public RQL_Datum {};			
+			class RQL_Single_Selection : public RQL_Object{};
 
 			class RQL_Database : public RQL {
 			public:
+				shared_ptr<RQL_Object> table(shared_ptr<RQL_String> table_name) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_TABLE);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = table_name->term;
+					object->conn = this->conn;
+					return object;
+				}
+
+				shared_ptr<RQL_Object> table(const string& table_name) {
+					return table(make_shared<RQL_String>(RQL_String(table_name)));
+				}
+
 				shared_ptr<RQL_Object> table_create(shared_ptr<RQL_String> table_name) {
 					shared_ptr<RQL_Object> object(new RQL_Object());
 					object->term.set_type(Term::TermType::Term_TermType_TABLE_CREATE);
