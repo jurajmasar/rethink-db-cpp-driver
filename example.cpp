@@ -46,6 +46,7 @@ int main(int argc, char* argv) {
 			std::cout << "  Possible actions:" << endl;
 			std::cout << "    db_create db_drop db_list use" << endl;
 			std::cout << "    table table_create table_drop table_list" << endl;
+			std::cout << "    insert" << endl;
 			std::cout << "    exit" << endl;
 			std::cout << "========================================================================" << endl << endl;
 			std::cout << endl;
@@ -108,6 +109,17 @@ int main(int argc, char* argv) {
 					responses = conn->r()->db(db_name)->table_list()->run();
 				}
 			}
+			else if (action == "insert") {
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				shared_ptr<RQL_Table> table;
+				if (db_name == "") {
+					table = conn->r()->table(ask("table_name"));
+				}
+				else {
+					table = conn->r()->db(db_name)->table(ask("table_name"));
+				}
+				responses = table->insert(RQL_Object(ask("key (string)"), RQL_String(ask("value (string)"))))->run();
+			}
 			else {
 				std::cout << "Invalid action." << endl;
 			}
@@ -128,5 +140,3 @@ int main(int argc, char* argv) {
 
 	return 0;
 }
-
-// conn->r()->db_create(ask("db_name"))->run();

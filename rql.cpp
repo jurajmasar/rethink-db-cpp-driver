@@ -19,6 +19,9 @@ namespace com {
 				query.set_token(rand());
 
 				*(query.mutable_query()) = term;
+				
+				// debugging
+				//query.PrintDebugString();
 
 				// write query
 				conn->write_query(query);

@@ -61,12 +61,11 @@ namespace com {
 			class RQL_Ordering : public RQL {};
 			class RQL_Pathspec : public RQL {};
 
-			class RQL_Sequence : public RQL {};
+			class RQL_Sequence : public virtual RQL {};
 			class RQL_Stream : public RQL_Sequence {};
-			class RQL_Stream_Selection : public RQL_Stream {};
-			class RQL_Table : public RQL_Stream_Selection {};
+			class RQL_Stream_Selection : public RQL_Stream {};			
 
-			class RQL_Datum : public RQL {};
+			class RQL_Datum : public virtual RQL {};
 			class RQL_Null : public RQL_Datum {};
 			class RQL_Bool : public RQL_Datum {
 			public:
@@ -92,19 +91,53 @@ namespace com {
 					term.mutable_datum()->set_r_str(str);
 				}
 			};
-			class RQL_Array : public RQL_Datum {
+
+			class RQL_Object : public RQL_Datum {
+			public:
+				RQL_Object () {};
+				RQL_Object(const string& key, const RQL_Datum& value) {
+					term.set_type(Term::TermType::Term_TermType_DATUM);
+					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_OBJECT);
+					Datum_AssocPair* ptr = term.mutable_datum()->add_r_object();
+					ptr->set_key(key);
+					*(ptr->mutable_val()) = value.term.datum();
+				}
+			};			
+
+			class RQL_Single_Selection : public RQL_Object{};
+
+			class RQL_Table : public RQL_Stream_Selection {
+			public:
+				shared_ptr<RQL_Object> insert(const RQL_Object& o) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_INSERT);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = o.term;
+					object->conn = this->conn;
+					return object;
+				}
+
+				shared_ptr<RQL_Object> insert(shared_ptr<RQL_Sequence> sequence) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					sequence->term.set_type(Term::TermType::Term_TermType_INSERT);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = sequence->term;
+					object->conn = this->conn;
+					return object;
+				}
+			};
+
+			class RQL_Array : public RQL_Datum, public RQL_Sequence {
 			public:
 				RQL_Array() {}
 
-				RQL_Array(vector<shared_ptr<RQL_Datum>> params) {
+				RQL_Array(const vector < shared_ptr < RQL_Datum >> &params) {
 					term.set_type(Term::TermType::Term_TermType_MAKE_ARRAY);
 					for_each(params.begin(), params.end(), [this](shared_ptr<RQL_Datum> datum) {
 						*(term.add_args()) = datum->term;
-					}); 
+					});
 				}
 			};
-			class RQL_Object : public RQL_Datum {};			
-			class RQL_Single_Selection : public RQL_Object{};
 
 			class RQL_Database : public RQL {
 			public:
