@@ -33,31 +33,33 @@ Essential functionality has been implemented only.
 	// filter all results, order them, set an offset and a limit
 	conn->r()->db(db_name)->table("my_table")->filter(RQL_Object("my_key", RQL_String("value")))->order_by(RQL_Ordering::asc("my_key"))->skip(3)->limit(10)->run();
 	
-See `example.cpp` for a compilable example usage.
+See `example.cpp` for more.
 
 Project structure
--------------------
+-------------------------
 
-    LICENSE
-    LICENSE.txt
-    README.md
-    connection.cpp - Object for maintaining a single connection to RDB
-    connection.hpp
-    example.cpp - Example usage of the driver, fully compilable
-    exception.hpp - Definitions of exceptions
-    include - Protobuf sources
-    lib - Protobuf libraries compiled for Windows 8 (please ignore if not using Windows 8)
-    proto - RethinkBD Protobuf
-    rethink_db.hpp - Meta file for inclusion in your project
-    rethink_db_cpp_driver.opensdf - MS VS 2013 Project file
-    rethink_db_cpp_driver.sdf - MS VS 2013 Project file
-    rethink_db_cpp_driver.sln - MS VS 2013 Project file
-    rethink_db_cpp_driver.v12.suo - MS VS 2013 Project file
-    rethink_db_cpp_driver.vcxproj - MS VS 2013 Project file
-    rethink_db_cpp_driver.vcxproj.filters - MS VS 2013 Project file
-    rethink_db_cpp_driver.vcxproj.user - MS VS 2013 Project file
-    rql.cpp - Implementation of RQL data structures in C++
-    rql.hpp - Implementation of RQL data structures in C++
+| File                                  | Description |
+| ------------------------------------- | ----------- |
+| LICENSE                               | 
+| LICENSE.txt                           | 
+| README.md                             | 
+| connection.cpp                        | Object for maintaining a single connection to RDB
+| connection.hpp                        | 
+| example.cpp                           | Example usage of the driver, fully compilable
+| exception.hpp                         | Definitions of exceptions
+| include                               | Protobuf sources
+| lib                                   | Protobuf libraries compiled for Windows 8 (please ignore if not using Windows 8)
+| proto                                 | RethinkBD Protobuf
+| rethink_db.hpp                        | Meta file for inclusion in your project
+| rethink_db_cpp_driver.opensdf         | MS VS 2013 Project file
+| rethink_db_cpp_driver.sdf             | MS VS 2013 Project file
+| rethink_db_cpp_driver.sln             | MS VS 2013 Project file
+| rethink_db_cpp_driver.v12.suo         | MS VS 2013 Project file
+| rethink_db_cpp_driver.vcxproj         | MS VS 2013 Project file
+| rethink_db_cpp_driver.vcxproj.filters | MS VS 2013 Project file
+| rethink_db_cpp_driver.vcxproj.user    | MS VS 2013 Project file
+| rql.cpp                               | Implementation of RQL data structures in C++
+| rql.hpp                               | Implementation of RQL data structures in C++
 
 Usage instructions
 ------------------
