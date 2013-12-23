@@ -70,16 +70,16 @@ namespace com {
 
 			/* -------------------------------------------------------------------- */
 
-			shared_ptr<RQL_Database> RQL::db(shared_ptr<RQL_String> db_name) {
+			shared_ptr<RQL_Database> RQL::db(const RQL_String& db_name) {
 				shared_ptr<RQL_Database> object(new RQL_Database());
 				object->term.set_type(Term::TermType::Term_TermType_DB);
-				*(object->term.add_args()) = db_name->term;
+				*(object->term.add_args()) = db_name.term;
 				object->conn = this->conn;
 				return object;
 			};
 
 			shared_ptr<RQL_Database> RQL::db(const string& db_name) {
-				return db(make_shared<RQL_String>(db_name));
+				return db(RQL_String(db_name));
 			};
 
 			shared_ptr<RQL_Array> RQL::db_list() {
@@ -89,54 +89,54 @@ namespace com {
 				return array;
 			}
 
-			shared_ptr<RQL_Object> RQL::db_create(shared_ptr<RQL_String> db_name) {
+			shared_ptr<RQL_Object> RQL::db_create(const RQL_String& db_name) {
 				shared_ptr<RQL_Object> object(new RQL_Object());
 				object->term.set_type(Term::TermType::Term_TermType_DB_CREATE);
-				*(object->term.add_args()) = db_name->term;
+				*(object->term.add_args()) = db_name.term;
 				object->conn = this->conn;
 				return object;
 			}
 
 			shared_ptr<RQL_Object> RQL::db_create(const string& db_name) {
-				return db_create(make_shared<RQL_String>(RQL_String(db_name)));
+				return db_create(RQL_String(RQL_String(db_name)));
 			}
 
-			shared_ptr<RQL_Object> RQL::db_drop(shared_ptr<RQL_String> db_name) {
+			shared_ptr<RQL_Object> RQL::db_drop(const RQL_String& db_name) {
 				shared_ptr<RQL_Object> object(new RQL_Object());
 				object->term.set_type(Term::TermType::Term_TermType_DB_DROP);
-				*(object->term.add_args()) = db_name->term;
+				*(object->term.add_args()) = db_name.term;
 				object->conn = this->conn;
 				return object;
 			}
 
 			shared_ptr<RQL_Object> RQL::db_drop(const string& db_name) {
-				return db_drop(make_shared<RQL_String>(RQL_String(db_name)));
+				return db_drop(RQL_String(RQL_String(db_name)));
 			}
 
 			/* -------------------------------------------------------------------- */
 
-			shared_ptr<RQL_Table> RQL::table(shared_ptr<RQL_String> table_name) {
+			shared_ptr<RQL_Table> RQL::table(const RQL_String& table_name) {
 				return db(this->conn->database)->table(table_name);
 			}
 
 			shared_ptr<RQL_Table> RQL::table(const string& table_name) {
-				return db(this->conn->database)->table(make_shared<RQL_String>(RQL_String(table_name)));
+				return db(this->conn->database)->table(RQL_String(table_name));
 			}
 
-			shared_ptr<RQL_Object> RQL::table_create(shared_ptr<RQL_String> table_name) {
+			shared_ptr<RQL_Object> RQL::table_create(const RQL_String& table_name) {
 				return db(this->conn->database)->table_create(table_name);
 			}
 
 			shared_ptr<RQL_Object> RQL::table_create(const string& table_name) {
-				return db(this->conn->database)->table_create(make_shared<RQL_String>(RQL_String(table_name)));
+				return db(this->conn->database)->table_create(RQL_String(table_name));
 			}
 
-			shared_ptr<RQL_Array> RQL::table_drop(shared_ptr<RQL_String> table_name) {
+			shared_ptr<RQL_Array> RQL::table_drop(const RQL_String& table_name) {
 				return db(this->conn->database)->table_drop(table_name);
 			}
 
 			shared_ptr<RQL_Array> RQL::table_drop(const string& table_name) {
-				return db(this->conn->database)->table_drop(make_shared<RQL_String>(RQL_String(table_name)));
+				return db(this->conn->database)->table_drop(RQL_String(table_name));
 			}
 
 			shared_ptr<RQL_Array> RQL::table_list() {
