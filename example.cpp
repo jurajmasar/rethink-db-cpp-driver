@@ -46,7 +46,7 @@ int main(int argc, char* argv) {
 			std::cout << "  Possible actions:" << endl;
 			std::cout << "    db_create db_drop db_list use" << endl;
 			std::cout << "    table table_create table_drop table_list" << endl;
-			std::cout << "    get insert remove" << endl;
+			std::cout << "    get insert remove update" << endl;
 			std::cout << "    exit" << endl;
 			std::cout << "========================================================================" << endl << endl;
 			std::cout << endl;
@@ -143,7 +143,7 @@ int main(int argc, char* argv) {
 				else {
 					table = conn->r()->db(db_name)->table(ask("table_name"));
 				}
-				responses = table->get(ask("key (string)"))->run();				
+				responses = table->get(ask("id (string)"))->run();				
 			}
 			else if (action == "remove") {
 				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
@@ -155,13 +155,25 @@ int main(int argc, char* argv) {
 				else {
 					table = conn->r()->db(db_name)->table(ask("table_name"));
 				}
-				string key = ask("key (leave empty for entire table)");
-				if (key == "") {
+				string id = ask("id (leave empty for entire table)");
+				if (id == "") {
 					responses = table->remove()->run();
 				}
 				else {
-					responses = table->get(key)->remove()->run();
+					responses = table->get(id)->remove()->run();
 				}
+			}
+			else if (action == "update") {
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				shared_ptr<RQL_Table> table;
+
+				if (db_name == "") {
+					table = conn->r()->table(ask("table_name"));
+				}
+				else {
+					table = conn->r()->db(db_name)->table(ask("table_name"));
+				}
+				responses = table->get(ask("id (string)"))->update(RQL_Object(ask("key (string)"), RQL_String(ask("value (string)"))))->run();
 			}
 			else {
 				std::cout << "Invalid action." << endl;

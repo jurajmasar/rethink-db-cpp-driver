@@ -87,6 +87,24 @@ namespace com {
 					object->conn = this->conn;
 					return object;
 				}
+
+				shared_ptr<RQL_Object> update(const RQL_Function& o) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_UPDATE);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = o.term;
+					object->conn = this->conn;
+					return object;
+				}
+
+				shared_ptr<RQL_Object> update(const RQL_Object& o) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_UPDATE);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = o.term;
+					object->conn = this->conn;
+					return object;
+				}
 			};			
 
 			class RQL_Null : public RQL_Datum {};
@@ -125,27 +143,28 @@ namespace com {
 					object->conn = this->conn;
 					return object;
 				}
-			};
 
-			class RQL_Table : public RQL_Stream_Selection {
-			public:
-				shared_ptr<RQL_Object> insert(const RQL_Object& o) {
+				shared_ptr<RQL_Object> update(const RQL_Function& o) {
 					shared_ptr<RQL_Object> object(new RQL_Object());
-					object->term.set_type(Term::TermType::Term_TermType_INSERT);
+					object->term.set_type(Term::TermType::Term_TermType_UPDATE);
 					*(object->term.add_args()) = this->term;
 					*(object->term.add_args()) = o.term;
 					object->conn = this->conn;
 					return object;
 				}
 
-				shared_ptr<RQL_Object> insert(const RQL_Sequence& sequence) {
+				shared_ptr<RQL_Object> update(const RQL_Object& o) {
 					shared_ptr<RQL_Object> object(new RQL_Object());
-					object->term.set_type(Term::TermType::Term_TermType_INSERT);
+					object->term.set_type(Term::TermType::Term_TermType_UPDATE);
 					*(object->term.add_args()) = this->term;
-					*(object->term.add_args()) = sequence.term;
+					*(object->term.add_args()) = o.term;
 					object->conn = this->conn;
 					return object;
 				}
+			};
+
+			class RQL_Table : public RQL_Stream_Selection {
+			public:
 
 				shared_ptr<RQL_Single_Selection> get(const RQL_String& key) {
 					shared_ptr<RQL_Single_Selection> object(new RQL_Single_Selection());
@@ -172,6 +191,24 @@ namespace com {
 				shared_ptr<RQL_Single_Selection> get(double key) {
 					return get(RQL_Number(key));
 				}
+
+				shared_ptr<RQL_Object> insert(const RQL_Object& o) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_INSERT);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = o.term;
+					object->conn = this->conn;
+					return object;
+				}
+
+				shared_ptr<RQL_Object> insert(const RQL_Sequence& sequence) {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_INSERT);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = sequence.term;
+					object->conn = this->conn;
+					return object;
+				}				
 			};
 
 			class RQL_Array : public RQL_Datum, public RQL_Sequence {
