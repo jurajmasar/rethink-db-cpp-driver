@@ -123,6 +123,32 @@ namespace com {
 					object->conn = this->conn;
 					return object;
 				}
+
+				shared_ptr<RQL_Single_Selection> get(const RQL_String& key) {
+					shared_ptr<RQL_Single_Selection> object(new RQL_Single_Selection());
+					object->term.set_type(Term::TermType::Term_TermType_GET);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = key.term;
+					object->conn = this->conn;
+					return object;
+				}
+
+				shared_ptr<RQL_Single_Selection> get(const string& key) {
+					return get(RQL_String(key));
+				}
+
+				shared_ptr<RQL_Single_Selection> get(const RQL_Number& key) {
+					shared_ptr<RQL_Single_Selection> object(new RQL_Single_Selection());
+					object->term.set_type(Term::TermType::Term_TermType_GET);
+					*(object->term.add_args()) = this->term;
+					*(object->term.add_args()) = key.term;
+					object->conn = this->conn;
+					return object;
+				}
+
+				shared_ptr<RQL_Single_Selection> get(double key) {
+					return get(RQL_Number(key));
+				}
 			};
 
 			class RQL_Array : public RQL_Datum, public RQL_Sequence {
