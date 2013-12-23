@@ -55,14 +55,6 @@ namespace com {
 
 			};
 
-			class RQL_Function : public RQL {};
-			class RQL_Ordering : public RQL {};
-			class RQL_Pathspec : public RQL {};
-
-			class RQL_Sequence : public virtual RQL {};
-			class RQL_Stream : public RQL_Sequence {};
-
-
 			class RQL_Datum : public virtual RQL {};
 
 			class RQL_Object : public RQL_Datum {
@@ -76,6 +68,33 @@ namespace com {
 					*(ptr->mutable_val()) = value.term.datum();
 				}
 			};
+
+			class RQL_Function : public RQL {};
+			class RQL_Ordering : public RQL {};
+			class RQL_Pathspec : public RQL {};
+
+			class RQL_Sequence : public virtual RQL {
+			public:
+
+				shared_ptr<RQL_Sequence> filter(const RQL_Function& object) {
+					shared_ptr<RQL_Sequence> sequence(new RQL_Sequence());
+					sequence->term.set_type(Term::TermType::Term_TermType_FILTER);
+					*(sequence->term.add_args()) = this->term;
+					*(sequence->term.add_args()) = object.term;
+					sequence->conn = this->conn;
+					return sequence;
+				}
+
+				shared_ptr<RQL_Sequence> filter(const RQL_Object& object) {
+					shared_ptr<RQL_Sequence> sequence(new RQL_Sequence());
+					sequence->term.set_type(Term::TermType::Term_TermType_FILTER);
+					*(sequence->term.add_args()) = this->term;
+					*(sequence->term.add_args()) = object.term;
+					sequence->conn = this->conn;
+					return sequence;
+				}
+			};
+			class RQL_Stream : public RQL_Sequence {};	
 
 			class RQL_Stream_Selection : public RQL_Stream {
 			public:

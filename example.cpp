@@ -43,10 +43,11 @@ int main(int argc, char* argv) {
 			responses = vector<shared_ptr<Response>>();
 			std::cout << endl;
 			std::cout << "========================================================================" << endl;
-			std::cout << "  Possible actions:" << endl;
-			std::cout << "    db_create db_drop db_list use" << endl;
-			std::cout << "    table table_create table_drop table_list" << endl;
-			std::cout << "    get insert remove update" << endl;
+			std::cout << "    ACCESSING REQL: use" << endl;
+			std::cout << "    MANIPULATING DATABASES: db_create db_drop db_list use" << endl;
+			std::cout << "    MANIPULATING TABLES: table_create table_drop table_list" << endl;
+			std::cout << "    WRITING DATA: insert remove update" << endl;
+			std::cout << "    SELECTING DATA: filter get table" << endl;
 			std::cout << "    exit" << endl;
 			std::cout << "========================================================================" << endl << endl;
 			std::cout << endl;
@@ -132,6 +133,18 @@ int main(int argc, char* argv) {
 					}
 					responses = table->insert(RQL_Array(objects))->run();
 				}
+			}
+			else if (action == "filter") {
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				shared_ptr<RQL_Table> table;
+
+				if (db_name == "") {
+					table = conn->r()->table(ask("table_name"));
+				}
+				else {
+					table = conn->r()->db(db_name)->table(ask("table_name"));
+				}
+				responses = table->filter(RQL_Object(ask("key (string)"), RQL_String(ask("value (string)"))))->run();
 			}
 			else if (action == "get") {
 				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
