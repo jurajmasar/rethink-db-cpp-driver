@@ -1,12 +1,10 @@
+#ifndef RETHINK_DB_DRIVER_CONNECTION
+#define RETHINK_DB_DRIVER_CONNECTION
+
 #include "proto\ql2.pb.h"
 #include <boost/asio.hpp>
 #include <string>
-#include <boost/format.hpp>
-#include "exception.hpp"
 #include "rql.hpp"
-
-#ifndef RETHINK_DB_DRIVER_CONNECTION
-#define RETHINK_DB_DRIVER_CONNECTION
 
 using namespace std;
 using namespace boost::asio;

@@ -18,16 +18,13 @@
     <ClCompile Include="proto\ql2.pb.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="example.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="rql.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="connection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="exception.cpp">
+    <ClCompile Include="example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

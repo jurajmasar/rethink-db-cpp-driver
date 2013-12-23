@@ -1,3 +1,5 @@
+#include <boost/format.hpp>
+#include "exception.hpp"
 #include "connection.hpp"
 
 namespace com {

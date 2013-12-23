@@ -1,7 +1,7 @@
-#include <stdexcept>
-
 #ifndef RETHINK_DB_DRIVER_EXCEPTION
 #define RETHINK_DB_DRIVER_EXCEPTION
+
+#include <stdexcept>
 
 using namespace std;
 

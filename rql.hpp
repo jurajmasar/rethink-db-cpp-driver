@@ -1,10 +1,8 @@
-#include "proto\ql2.pb.h"
-#include <vector>
-#include "exception.hpp"
-#include <memory>
-
 #ifndef RETHINK_DB_DRIVER_RQL
 #define RETHINK_DB_DRIVER_RQL
+
+#include "proto\ql2.pb.h"
+#include <vector>
 
 using namespace std;
 using namespace com::rethinkdb;

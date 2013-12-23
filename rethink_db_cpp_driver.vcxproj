@@ -78,7 +78,6 @@
   <ItemGroup>
     <ClCompile Include="connection.cpp" />
     <ClCompile Include="example.cpp" />
-    <ClCompile Include="exception.cpp" />
     <ClCompile Include="proto\ql2.pb.cc" />
     <ClCompile Include="rql.cpp" />
   </ItemGroup>
