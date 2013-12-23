@@ -4,6 +4,8 @@
 
 This project has been developed on (emulated) Windows 8 using Microsoft Visual Studio 2013 RC.
 
+**Pull requests are welcomed!**
+
 Functionality
 -------------
 Essential functionality has been implemented only.
