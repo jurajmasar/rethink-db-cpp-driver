@@ -61,9 +61,34 @@ namespace com {
 
 			class RQL_Sequence : public virtual RQL {};
 			class RQL_Stream : public RQL_Sequence {};
-			class RQL_Stream_Selection : public RQL_Stream {};			
+
 
 			class RQL_Datum : public virtual RQL {};
+
+			class RQL_Object : public RQL_Datum {
+			public:
+				RQL_Object() {};
+				RQL_Object(const string& key, const RQL_Datum& value) {
+					term.set_type(Term::TermType::Term_TermType_DATUM);
+					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_OBJECT);
+					Datum_AssocPair* ptr = term.mutable_datum()->add_r_object();
+					ptr->set_key(key);
+					*(ptr->mutable_val()) = value.term.datum();
+				}
+			};
+
+			class RQL_Stream_Selection : public RQL_Stream {
+			public:
+				// "delete" is a reserved word in C++ :-(
+				shared_ptr<RQL_Object> remove() {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_DELETE);
+					*(object->term.add_args()) = this->term;
+					object->conn = this->conn;
+					return object;
+				}
+			};			
+
 			class RQL_Null : public RQL_Datum {};
 			class RQL_Bool : public RQL_Datum {
 			public:
@@ -88,21 +113,19 @@ namespace com {
 					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_STR);
 					term.mutable_datum()->set_r_str(str);
 				}
-			};
-
-			class RQL_Object : public RQL_Datum {
-			public:
-				RQL_Object () {};
-				RQL_Object(const string& key, const RQL_Datum& value) {
-					term.set_type(Term::TermType::Term_TermType_DATUM);
-					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_OBJECT);
-					Datum_AssocPair* ptr = term.mutable_datum()->add_r_object();
-					ptr->set_key(key);
-					*(ptr->mutable_val()) = value.term.datum();
-				}
 			};			
 
-			class RQL_Single_Selection : public RQL_Object{};
+			class RQL_Single_Selection : public RQL_Object{
+			public:
+				// "delete" is a reserved word in C++ :-(
+				shared_ptr<RQL_Object> remove() {
+					shared_ptr<RQL_Object> object(new RQL_Object());
+					object->term.set_type(Term::TermType::Term_TermType_DELETE);
+					*(object->term.add_args()) = this->term;
+					object->conn = this->conn;
+					return object;
+				}
+			};
 
 			class RQL_Table : public RQL_Stream_Selection {
 			public:
