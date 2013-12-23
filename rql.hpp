@@ -57,6 +57,15 @@ namespace com {
 
 			class RQL_Datum : public virtual RQL {};
 
+			class RQL_String : public RQL_Datum {
+			public:
+				RQL_String(const string& str) {
+					term.set_type(Term::TermType::Term_TermType_DATUM);
+					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_STR);
+					term.mutable_datum()->set_r_str(str);
+				}
+			};
+
 			class RQL_Object : public RQL_Datum {
 			public:
 				RQL_Object() {};
@@ -70,7 +79,30 @@ namespace com {
 			};
 
 			class RQL_Function : public RQL {};
-			class RQL_Ordering : public RQL {};
+			class RQL_Ordering : public RQL {
+			public:
+				static shared_ptr<RQL_Ordering> asc(const RQL_String& str) {
+					shared_ptr<RQL_Ordering> ordering(new RQL_Ordering());
+					ordering->term.set_type(Term::TermType::Term_TermType_ASC);
+					*(ordering->term.add_args()) = str.term;
+					return ordering;
+				}
+
+				static shared_ptr<RQL_Ordering> asc(const string& str) {
+					return asc(RQL_String(str));
+				}
+
+				static shared_ptr<RQL_Ordering> desc(const RQL_String& str) {
+					shared_ptr<RQL_Ordering> ordering(new RQL_Ordering());
+					ordering->term.set_type(Term::TermType::Term_TermType_DESC);
+					*(ordering->term.add_args()) = str.term;
+					return ordering;
+				}
+
+				static shared_ptr<RQL_Ordering> desc(const string& str) {
+					return desc(RQL_String(str));
+				}
+			};
 			class RQL_Pathspec : public RQL {};
 
 			class RQL_Sequence : public virtual RQL {
@@ -90,6 +122,17 @@ namespace com {
 					sequence->term.set_type(Term::TermType::Term_TermType_FILTER);
 					*(sequence->term.add_args()) = this->term;
 					*(sequence->term.add_args()) = object.term;
+					sequence->conn = this->conn;
+					return sequence;
+				}
+
+				shared_ptr<RQL_Sequence> order_by(const vector<shared_ptr<RQL_Ordering>>& orderings) {
+					shared_ptr<RQL_Sequence> sequence(new RQL_Sequence());
+					sequence->term.set_type(Term::TermType::Term_TermType_ORDERBY);
+					*(sequence->term.add_args()) = this->term;
+					for_each(orderings.begin(), orderings.end(), [sequence](shared_ptr<RQL_Ordering> ordering) {
+						*(sequence->term.add_args()) = ordering->term;
+					});
 					sequence->conn = this->conn;
 					return sequence;
 				}
@@ -152,15 +195,7 @@ namespace com {
 					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_NUM);
 					term.mutable_datum()->set_r_num(number);
 				}
-			};
-			class RQL_String : public RQL_Datum {
-			public:
-				RQL_String(const string& str) {
-					term.set_type(Term::TermType::Term_TermType_DATUM);
-					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_STR);
-					term.mutable_datum()->set_r_str(str);
-				}
-			};			
+			};				
 
 			class RQL_Single_Selection : public RQL_Object{
 			public:
