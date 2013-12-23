@@ -9,7 +9,7 @@ namespace com {
 	namespace rethinkdb {
 		namespace driver {
 
-			class connection_exception : public runtime_error{
+			class connection_exception : public runtime_error {
 			public:
 				connection_exception() : runtime_error(""){}
 				connection_exception(const string& msg) : runtime_error(("RethinkDB connection exception. " + msg).c_str()){}

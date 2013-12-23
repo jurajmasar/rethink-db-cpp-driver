@@ -17,7 +17,7 @@ namespace com {
 			class RQL_String;
 			class RQL_Database;
 			class RQL_Table;
-			class RQL { // "Top" according to photobuf specification
+			class RQL { // "Top" according to photobuf data structure specification
 			public:			
 
 				RQL::RQL() : term(Term()) {};
@@ -142,6 +142,15 @@ namespace com {
 					for_each(orderings.begin(), orderings.end(), [sequence](shared_ptr<RQL_Ordering> ordering) {
 						*(sequence->term.add_args()) = ordering->term;
 					});
+					sequence->conn = this->conn;
+					return sequence;
+				}
+
+				shared_ptr<RQL_Sequence> order_by(const RQL_Ordering& ordering) {
+					shared_ptr<RQL_Sequence> sequence(new RQL_Sequence());
+					sequence->term.set_type(Term::TermType::Term_TermType_ORDERBY);
+					*(sequence->term.add_args()) = this->term;
+					*(sequence->term.add_args()) = ordering.term;
 					sequence->conn = this->conn;
 					return sequence;
 				}
