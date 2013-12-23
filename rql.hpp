@@ -66,6 +66,15 @@ namespace com {
 				}
 			};
 
+			class RQL_Number : public RQL_Datum {
+			public:
+				RQL_Number(double number) {
+					term.set_type(Term::TermType::Term_TermType_DATUM);
+					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_NUM);
+					term.mutable_datum()->set_r_num(number);
+				}
+			};
+
 			class RQL_Object : public RQL_Datum {
 			public:
 				RQL_Object() {};
@@ -136,6 +145,32 @@ namespace com {
 					sequence->conn = this->conn;
 					return sequence;
 				}
+
+				shared_ptr<RQL_Sequence> skip(const RQL_Number& number) {
+					shared_ptr<RQL_Sequence> sequence(new RQL_Sequence());
+					sequence->term.set_type(Term::TermType::Term_TermType_SKIP);
+					*(sequence->term.add_args()) = this->term;
+					*(sequence->term.add_args()) = number.term;
+					sequence->conn = this->conn;
+					return sequence;
+				}
+
+				shared_ptr<RQL_Sequence> skip(size_t number) {
+					return skip(RQL_Number((double)number));
+				}
+
+				shared_ptr<RQL_Sequence> limit(const RQL_Number& number) {
+					shared_ptr<RQL_Sequence> sequence(new RQL_Sequence());
+					sequence->term.set_type(Term::TermType::Term_TermType_LIMIT);
+					*(sequence->term.add_args()) = this->term;
+					*(sequence->term.add_args()) = number.term;
+					sequence->conn = this->conn;
+					return sequence;
+				}
+
+				shared_ptr<RQL_Sequence> limit(size_t number) {
+					return limit(RQL_Number((double)number));
+				}
 			};
 			class RQL_Stream : public RQL_Sequence {};	
 
@@ -187,15 +222,7 @@ namespace com {
 					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_BOOL);
 					term.mutable_datum()->set_r_bool(b);
 				}
-			};
-			class RQL_Number : public RQL_Datum {
-			public:
-				RQL_Number(double number) {
-					term.set_type(Term::TermType::Term_TermType_DATUM);
-					term.mutable_datum()->set_type(Datum::DatumType::Datum_DatumType_R_NUM);
-					term.mutable_datum()->set_r_num(number);
-				}
-			};				
+			};			
 
 			class RQL_Single_Selection : public RQL_Object{
 			public:

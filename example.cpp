@@ -48,7 +48,7 @@ int main(int argc, char* argv) {
 			std::cout << "    MANIPULATING TABLES: table_create table_drop table_list" << endl;
 			std::cout << "    WRITING DATA: insert remove update" << endl;
 			std::cout << "    SELECTING DATA: between filter get table" << endl;
-			std::cout << "    TRANSFORMATIONS: order_by" << endl;
+			std::cout << "    TRANSFORMATIONS: limit order_by skip" << endl;
 			std::cout << "    exit" << endl;
 			std::cout << "========================================================================" << endl << endl;
 			std::cout << endl;
@@ -201,6 +201,20 @@ int main(int argc, char* argv) {
 				}
 				responses = table->get(ask("id (string)"))->update(RQL_Object(ask("key (string)"), RQL_String(ask("value (string)"))))->run();
 			}
+			else if (action == "limit") {
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				shared_ptr<RQL_Table> table;
+
+				if (db_name == "") {
+					table = conn->r()->table(ask("table_name"));
+				}
+				else {
+					table = conn->r()->db(db_name)->table(ask("table_name"));
+				}
+				vector<shared_ptr<RQL_Ordering>> orderings = vector<shared_ptr<RQL_Ordering>>();
+				orderings.push_back(RQL_Ordering::asc(ask("order_by key (string)")));
+				responses = table->order_by(orderings)->limit(atoi(ask("limit").c_str()))->run();
+			}
 			else if (action == "order_by") {
 				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
 				shared_ptr<RQL_Table> table;
@@ -212,8 +226,22 @@ int main(int argc, char* argv) {
 					table = conn->r()->db(db_name)->table(ask("table_name"));
 				}
 				vector<shared_ptr<RQL_Ordering>> orderings = vector<shared_ptr<RQL_Ordering>>();
-				orderings.push_back(RQL_Ordering::asc(ask("key (string)")));
+				orderings.push_back(RQL_Ordering::asc(ask("order_by key (string)")));
 				responses = table->order_by(orderings)->run();
+			}
+			else if (action == "skip") {
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				shared_ptr<RQL_Table> table;
+
+				if (db_name == "") {
+					table = conn->r()->table(ask("table_name"));
+				}
+				else {
+					table = conn->r()->db(db_name)->table(ask("table_name"));
+				}
+				vector<shared_ptr<RQL_Ordering>> orderings = vector<shared_ptr<RQL_Ordering>>();
+				orderings.push_back(RQL_Ordering::asc(ask("order_by key (string)")));
+				responses = table->order_by(orderings)->skip(atoi(ask("skip").c_str()))->run();
 			}
 			else {
 				std::cout << "Invalid action." << endl;
