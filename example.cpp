@@ -47,7 +47,7 @@ int main(int argc, char* argv) {
 			std::cout << "    MANIPULATING DATABASES: db_create db_drop db_list use" << endl;
 			std::cout << "    MANIPULATING TABLES: table_create table_drop table_list" << endl;
 			std::cout << "    WRITING DATA: insert remove update" << endl;
-			std::cout << "    SELECTING DATA: filter get table" << endl;
+			std::cout << "    SELECTING DATA: between filter get table" << endl;
 			std::cout << "    exit" << endl;
 			std::cout << "========================================================================" << endl << endl;
 			std::cout << endl;
@@ -133,6 +133,18 @@ int main(int argc, char* argv) {
 					}
 					responses = table->insert(RQL_Array(objects))->run();
 				}
+			}
+			else if (action == "between") {
+				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
+				shared_ptr<RQL_Table> table;
+
+				if (db_name == "") {
+					table = conn->r()->table(ask("table_name"));
+				}
+				else {
+					table = conn->r()->db(db_name)->table(ask("table_name"));
+				}
+				responses = table->between(RQL_String(ask("id from (string)")), RQL_String(ask("id until (string)")))->run();
 			}
 			else if (action == "filter") {
 				string db_name = ask("db_name (leave empty for '" + conn->database + "')");

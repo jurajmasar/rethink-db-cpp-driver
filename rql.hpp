@@ -98,6 +98,16 @@ namespace com {
 
 			class RQL_Stream_Selection : public RQL_Stream {
 			public:
+				shared_ptr<RQL_Stream_Selection> between(const RQL_Datum& d1, const RQL_Datum& d2) {
+					shared_ptr<RQL_Stream_Selection> selection(new RQL_Stream_Selection());
+					selection->term.set_type(Term::TermType::Term_TermType_BETWEEN);
+					*(selection->term.add_args()) = this->term;
+					*(selection->term.add_args()) = d1.term;
+					*(selection->term.add_args()) = d2.term;
+					selection->conn = this->conn;
+					return selection;
+				}
+
 				// "delete" is a reserved word in C++ :-(
 				shared_ptr<RQL_Object> remove() {
 					shared_ptr<RQL_Object> object(new RQL_Object());
