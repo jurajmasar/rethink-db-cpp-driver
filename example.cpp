@@ -112,13 +112,26 @@ int main(int argc, char* argv) {
 			else if (action == "insert") {
 				string db_name = ask("db_name (leave empty for '" + conn->database + "')");
 				shared_ptr<RQL_Table> table;
+
 				if (db_name == "") {
 					table = conn->r()->table(ask("table_name"));
 				}
 				else {
 					table = conn->r()->db(db_name)->table(ask("table_name"));
 				}
-				responses = table->insert(RQL_Object(ask("key (string)"), RQL_String(ask("value (string)"))))->run();
+
+				int count = atoi(ask("number of objects you want to insert").c_str());
+				if (count == 1) {
+					// insert one object
+					responses = table->insert(RQL_Object(ask("key (string)"), RQL_String(ask("value (string)"))))->run();
+				}
+				else if (count > 1) {
+					vector<shared_ptr<RQL_Datum>> objects = vector<shared_ptr<RQL_Datum>>();
+					for (int i = 1; i <= count; ++i) {
+						objects.push_back(make_shared<RQL_Datum>(RQL_Object(ask("key " + to_string(i) + " (string)"), RQL_String(ask("value " + to_string(i) + " (string)")))));
+					}
+					responses = table->insert(RQL_Array(objects))->run();
+				}
 			}
 			else {
 				std::cout << "Invalid action." << endl;
