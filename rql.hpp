@@ -1,7 +1,7 @@
 #ifndef RETHINK_DB_DRIVER_RQL
 #define RETHINK_DB_DRIVER_RQL
 
-#include "proto\ql2.pb.h"
+#include "proto/rdb_protocol/ql2.pb.h"
 #include <vector>
 
 using namespace std;
@@ -20,9 +20,9 @@ namespace com {
 			class RQL { // "Top" according to photobuf data structure specification
 			public:			
 
-				RQL::RQL() : term(Term()) {};
+				RQL() : term(Term()) {};
 
-				vector<shared_ptr<Response>> RQL::run();				
+				vector<shared_ptr<Response>> run();				
 
 				/* -------------------------------------------------------------------- */
 

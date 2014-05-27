@@ -65,6 +65,8 @@ namespace com {
 				case Response::ResponseType::Response_ResponseType_COMPILE_ERROR:
 					throw compile_error_exception("\n\nResponse received:\n" + response->DebugString());
 					break;
+				default:
+					break;
 				}
 			}
 
