@@ -1,7 +1,7 @@
 #ifndef RETHINK_DB_DRIVER_CONNECTION
 #define RETHINK_DB_DRIVER_CONNECTION
 
-#include "proto\ql2.pb.h"
+#include "proto/rdb_protocol/ql2.pb.h"
 #include <boost/asio.hpp>
 #include <string>
 #include "rql.hpp"

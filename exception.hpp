@@ -2,6 +2,7 @@
 #define RETHINK_DB_DRIVER_EXCEPTION
 
 #include <stdexcept>
+#include <string>
 
 using namespace std;
 
